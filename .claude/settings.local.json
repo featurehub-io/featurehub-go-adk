@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://raw.githubusercontent.com/featurehub-io/featurehub/refs/heads/main/infra/api-bucket/files/mrapi/1.2.5.yaml\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/featurehub-io/featurehub/refs/heads/main/infra/api-bucket/files/mrapi/1.2.5.yaml\" -o /Users/richard/projects/fh/featurehub-go-adk/api/mrapi-1.2.5.yaml)",
+      "Bash(mkdir -p /Users/richard/projects/fh/featurehub-go-adk/pkg/mrclient)",
+      "Bash(ogen --target pkg/mrclient --package mrclient api/mrapi-1.2.5.yaml)",
+      "Bash(go env *)",
+      "Bash(go version *)",
+      "Bash(make build *)"
+    ]
+  }
+}
