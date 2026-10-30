@@ -30,7 +30,20 @@ type AddPersonToGroupUnauthorized struct{}
 
 func (*AddPersonToGroupUnauthorized) addPersonToGroupRes() {}
 
-type AdminServiceResetTokenResponse jx.Raw
+// Ref: #/components/schemas/AdminServiceResetTokenResponse
+type AdminServiceResetTokenResponse struct {
+	Token string `json:"token"`
+}
+
+// GetToken returns the value of Token.
+func (s *AdminServiceResetTokenResponse) GetToken() string {
+	return s.Token
+}
+
+// SetToken sets the value of Token.
+func (s *AdminServiceResetTokenResponse) SetToken(val string) {
+	s.Token = val
+}
 
 func (*AdminServiceResetTokenResponse) resetSecurityTokenRes() {}
 
@@ -235,11 +248,92 @@ func (*Application) getApplicationRes()               {}
 func (*Application) updateApplicationOnPortfolioRes() {}
 func (*Application) updateApplicationRes()            {}
 
-type ApplicationFeatureValues jx.Raw
+// Ref: #/components/schemas/ApplicationFeatureValues
+type ApplicationFeatureValues struct {
+	ApplicationId uuid.UUID                  `json:"applicationId"`
+	Features      []Feature                  `json:"features"`
+	Environments  []EnvironmentFeatureValues `json:"environments"`
+	MaxFeatures   int                        `json:"maxFeatures"`
+}
+
+// GetApplicationId returns the value of ApplicationId.
+func (s *ApplicationFeatureValues) GetApplicationId() uuid.UUID {
+	return s.ApplicationId
+}
+
+// GetFeatures returns the value of Features.
+func (s *ApplicationFeatureValues) GetFeatures() []Feature {
+	return s.Features
+}
+
+// GetEnvironments returns the value of Environments.
+func (s *ApplicationFeatureValues) GetEnvironments() []EnvironmentFeatureValues {
+	return s.Environments
+}
+
+// GetMaxFeatures returns the value of MaxFeatures.
+func (s *ApplicationFeatureValues) GetMaxFeatures() int {
+	return s.MaxFeatures
+}
+
+// SetApplicationId sets the value of ApplicationId.
+func (s *ApplicationFeatureValues) SetApplicationId(val uuid.UUID) {
+	s.ApplicationId = val
+}
+
+// SetFeatures sets the value of Features.
+func (s *ApplicationFeatureValues) SetFeatures(val []Feature) {
+	s.Features = val
+}
+
+// SetEnvironments sets the value of Environments.
+func (s *ApplicationFeatureValues) SetEnvironments(val []EnvironmentFeatureValues) {
+	s.Environments = val
+}
+
+// SetMaxFeatures sets the value of MaxFeatures.
+func (s *ApplicationFeatureValues) SetMaxFeatures(val int) {
+	s.MaxFeatures = val
+}
 
 func (*ApplicationFeatureValues) findAllFeatureAndFeatureValuesForEnvironmentsByApplicationRes() {}
 
-type ApplicationGroupRole jx.Raw
+// Ref: #/components/schemas/ApplicationGroupRole
+type ApplicationGroupRole struct {
+	ApplicationId uuid.UUID             `json:"applicationId"`
+	GroupId       uuid.UUID             `json:"groupId"`
+	Roles         []ApplicationRoleType `json:"roles"`
+}
+
+// GetApplicationId returns the value of ApplicationId.
+func (s *ApplicationGroupRole) GetApplicationId() uuid.UUID {
+	return s.ApplicationId
+}
+
+// GetGroupId returns the value of GroupId.
+func (s *ApplicationGroupRole) GetGroupId() uuid.UUID {
+	return s.GroupId
+}
+
+// GetRoles returns the value of Roles.
+func (s *ApplicationGroupRole) GetRoles() []ApplicationRoleType {
+	return s.Roles
+}
+
+// SetApplicationId sets the value of ApplicationId.
+func (s *ApplicationGroupRole) SetApplicationId(val uuid.UUID) {
+	s.ApplicationId = val
+}
+
+// SetGroupId sets the value of GroupId.
+func (s *ApplicationGroupRole) SetGroupId(val uuid.UUID) {
+	s.GroupId = val
+}
+
+// SetRoles sets the value of Roles.
+func (s *ApplicationGroupRole) SetRoles(val []ApplicationRoleType) {
+	s.Roles = val
+}
 
 // Ref: #/components/schemas/ApplicationPermissions
 type ApplicationPermissions struct {
@@ -915,10 +1009,10 @@ func (*CreateApplicationUnauthorized) createApplicationRes() {}
 
 // Ref: #/components/schemas/CreateEnvironment
 type CreateEnvironment struct {
-	Name               string                                 `json:"name"`
-	PriorEnvironmentId OptNilUUID                             `json:"priorEnvironmentId"`
-	Description        string                                 `json:"description"`
-	EnvironmentInfo    OptNilCreateEnvironmentEnvironmentInfo `json:"environmentInfo"`
+	Name               string     `json:"name"`
+	PriorEnvironmentId OptNilUUID `json:"priorEnvironmentId"`
+	Description        string     `json:"description"`
+	EnvironmentInfo    jx.Raw     `json:"environmentInfo"`
 	// Is this a production environment?.
 	Production OptBool `json:"production"`
 }
@@ -939,7 +1033,7 @@ func (s *CreateEnvironment) GetDescription() string {
 }
 
 // GetEnvironmentInfo returns the value of EnvironmentInfo.
-func (s *CreateEnvironment) GetEnvironmentInfo() OptNilCreateEnvironmentEnvironmentInfo {
+func (s *CreateEnvironment) GetEnvironmentInfo() jx.Raw {
 	return s.EnvironmentInfo
 }
 
@@ -964,7 +1058,7 @@ func (s *CreateEnvironment) SetDescription(val string) {
 }
 
 // SetEnvironmentInfo sets the value of EnvironmentInfo.
-func (s *CreateEnvironment) SetEnvironmentInfo(val OptNilCreateEnvironmentEnvironmentInfo) {
+func (s *CreateEnvironment) SetEnvironmentInfo(val jx.Raw) {
 	s.EnvironmentInfo = val
 }
 
@@ -982,17 +1076,6 @@ func (*CreateEnvironmentBadRequest) createEnvironmentRes() {}
 type CreateEnvironmentConflict struct{}
 
 func (*CreateEnvironmentConflict) createEnvironmentRes() {}
-
-type CreateEnvironmentEnvironmentInfo map[string]string
-
-func (s *CreateEnvironmentEnvironmentInfo) init() CreateEnvironmentEnvironmentInfo {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
-}
 
 // CreateEnvironmentForbidden is response for CreateEnvironment operation.
 type CreateEnvironmentForbidden struct{}
@@ -1034,7 +1117,159 @@ type CreateEnvironmentUnauthorized struct{}
 
 func (*CreateEnvironmentUnauthorized) createEnvironmentRes() {}
 
-type CreateFeature jx.Raw
+// Only used when creating a new feature.
+// Ref: #/components/schemas/CreateFeature
+type CreateFeature struct {
+	// Unique within this application.
+	Key string `json:"key"`
+	// Use this in code, as then people cannot guess your new features from their names.
+	Alias OptNilString `json:"alias"`
+	Link  OptNilString `json:"link"`
+	// Description if any.
+	Name      string           `json:"name"`
+	ValueType FeatureValueType `json:"valueType"`
+	// Should the config remain invisible to users without secret permission.
+	Secret      OptNilBool   `json:"secret"`
+	Description OptNilString `json:"description"`
+	// Metadata that may need to be stored. Intended for ADK use. No data limit on FHOS. 10k on SaaS.
+	// (stored as CLOB).
+	MetaData OptNilString `json:"metaData"`
+	// The ID's of Filters associated with this feature.
+	FeatureFilter OptNilUUIDArray `json:"featureFilter"`
+}
+
+// GetKey returns the value of Key.
+func (s *CreateFeature) GetKey() string {
+	return s.Key
+}
+
+// GetAlias returns the value of Alias.
+func (s *CreateFeature) GetAlias() OptNilString {
+	return s.Alias
+}
+
+// GetLink returns the value of Link.
+func (s *CreateFeature) GetLink() OptNilString {
+	return s.Link
+}
+
+// GetName returns the value of Name.
+func (s *CreateFeature) GetName() string {
+	return s.Name
+}
+
+// GetValueType returns the value of ValueType.
+func (s *CreateFeature) GetValueType() FeatureValueType {
+	return s.ValueType
+}
+
+// GetSecret returns the value of Secret.
+func (s *CreateFeature) GetSecret() OptNilBool {
+	return s.Secret
+}
+
+// GetDescription returns the value of Description.
+func (s *CreateFeature) GetDescription() OptNilString {
+	return s.Description
+}
+
+// GetMetaData returns the value of MetaData.
+func (s *CreateFeature) GetMetaData() OptNilString {
+	return s.MetaData
+}
+
+// GetFeatureFilter returns the value of FeatureFilter.
+func (s *CreateFeature) GetFeatureFilter() OptNilUUIDArray {
+	return s.FeatureFilter
+}
+
+// SetKey sets the value of Key.
+func (s *CreateFeature) SetKey(val string) {
+	s.Key = val
+}
+
+// SetAlias sets the value of Alias.
+func (s *CreateFeature) SetAlias(val OptNilString) {
+	s.Alias = val
+}
+
+// SetLink sets the value of Link.
+func (s *CreateFeature) SetLink(val OptNilString) {
+	s.Link = val
+}
+
+// SetName sets the value of Name.
+func (s *CreateFeature) SetName(val string) {
+	s.Name = val
+}
+
+// SetValueType sets the value of ValueType.
+func (s *CreateFeature) SetValueType(val FeatureValueType) {
+	s.ValueType = val
+}
+
+// SetSecret sets the value of Secret.
+func (s *CreateFeature) SetSecret(val OptNilBool) {
+	s.Secret = val
+}
+
+// SetDescription sets the value of Description.
+func (s *CreateFeature) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
+// SetMetaData sets the value of MetaData.
+func (s *CreateFeature) SetMetaData(val OptNilString) {
+	s.MetaData = val
+}
+
+// SetFeatureFilter sets the value of FeatureFilter.
+func (s *CreateFeature) SetFeatureFilter(val OptNilUUIDArray) {
+	s.FeatureFilter = val
+}
+
+// A filter used by an API key to determine what kind of features it should send to the client.
+// Ref: #/components/schemas/CreateFeatureFilter
+type CreateFeatureFilter struct {
+	// Unique within this portfolio.
+	Name        string       `json:"name"`
+	Description OptNilString `json:"description"`
+}
+
+// GetName returns the value of Name.
+func (s *CreateFeatureFilter) GetName() string {
+	return s.Name
+}
+
+// GetDescription returns the value of Description.
+func (s *CreateFeatureFilter) GetDescription() OptNilString {
+	return s.Description
+}
+
+// SetName sets the value of Name.
+func (s *CreateFeatureFilter) SetName(val string) {
+	s.Name = val
+}
+
+// SetDescription sets the value of Description.
+func (s *CreateFeatureFilter) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
+// CreateFeatureFilterBadRequest is response for CreateFeatureFilter operation.
+type CreateFeatureFilterBadRequest struct{}
+
+func (*CreateFeatureFilterBadRequest) createFeatureFilterRes() {}
+
+// CreateFeatureFilterNotFound is response for CreateFeatureFilter operation.
+type CreateFeatureFilterNotFound struct{}
+
+func (*CreateFeatureFilterNotFound) createFeatureFilterRes() {}
+
+// CreateFeatureFilterUnauthorized is response for CreateFeatureFilter operation.
+type CreateFeatureFilterUnauthorized struct{}
+
+func (*CreateFeatureFilterUnauthorized) createFeatureFilterRes() {}
 
 // CreateFeatureForEnvironmentBadRequest is response for CreateFeatureForEnvironment operation.
 type CreateFeatureForEnvironmentBadRequest struct{}
@@ -1188,7 +1423,55 @@ type CreatePersonConflict struct{}
 
 func (*CreatePersonConflict) createPersonRes() {}
 
-type CreatePersonDetails jx.Raw
+// Ref: #/components/schemas/CreatePersonDetails
+type CreatePersonDetails struct {
+	// Can be null if a service account.
+	Email      OptNilString `json:"email"`
+	PersonType PersonType   `json:"personType"`
+	// Can be null if a service account.
+	Name     OptNilString    `json:"name"`
+	GroupIds OptNilUUIDArray `json:"groupIds"`
+}
+
+// GetEmail returns the value of Email.
+func (s *CreatePersonDetails) GetEmail() OptNilString {
+	return s.Email
+}
+
+// GetPersonType returns the value of PersonType.
+func (s *CreatePersonDetails) GetPersonType() PersonType {
+	return s.PersonType
+}
+
+// GetName returns the value of Name.
+func (s *CreatePersonDetails) GetName() OptNilString {
+	return s.Name
+}
+
+// GetGroupIds returns the value of GroupIds.
+func (s *CreatePersonDetails) GetGroupIds() OptNilUUIDArray {
+	return s.GroupIds
+}
+
+// SetEmail sets the value of Email.
+func (s *CreatePersonDetails) SetEmail(val OptNilString) {
+	s.Email = val
+}
+
+// SetPersonType sets the value of PersonType.
+func (s *CreatePersonDetails) SetPersonType(val PersonType) {
+	s.PersonType = val
+}
+
+// SetName sets the value of Name.
+func (s *CreatePersonDetails) SetName(val OptNilString) {
+	s.Name = val
+}
+
+// SetGroupIds sets the value of GroupIds.
+func (s *CreatePersonDetails) SetGroupIds(val OptNilUUIDArray) {
+	s.GroupIds = val
+}
 
 // CreatePersonForbidden is response for CreatePerson operation.
 type CreatePersonForbidden struct{}
@@ -1251,7 +1534,54 @@ type CreatePortfolioUnauthorized struct{}
 
 func (*CreatePortfolioUnauthorized) createPortfolioRes() {}
 
-type CreateServiceAccount jx.Raw
+// Ref: #/components/schemas/CreateServiceAccount
+type CreateServiceAccount struct {
+	Name        string       `json:"name"`
+	Description OptNilString `json:"description"`
+	// The ID's of Filters associated with this service account.
+	FeatureFilter OptNilUUIDArray            `json:"featureFilter"`
+	Permissions   []ServiceAccountPermission `json:"permissions"`
+}
+
+// GetName returns the value of Name.
+func (s *CreateServiceAccount) GetName() string {
+	return s.Name
+}
+
+// GetDescription returns the value of Description.
+func (s *CreateServiceAccount) GetDescription() OptNilString {
+	return s.Description
+}
+
+// GetFeatureFilter returns the value of FeatureFilter.
+func (s *CreateServiceAccount) GetFeatureFilter() OptNilUUIDArray {
+	return s.FeatureFilter
+}
+
+// GetPermissions returns the value of Permissions.
+func (s *CreateServiceAccount) GetPermissions() []ServiceAccountPermission {
+	return s.Permissions
+}
+
+// SetName sets the value of Name.
+func (s *CreateServiceAccount) SetName(val string) {
+	s.Name = val
+}
+
+// SetDescription sets the value of Description.
+func (s *CreateServiceAccount) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
+// SetFeatureFilter sets the value of FeatureFilter.
+func (s *CreateServiceAccount) SetFeatureFilter(val OptNilUUIDArray) {
+	s.FeatureFilter = val
+}
+
+// SetPermissions sets the value of Permissions.
+func (s *CreateServiceAccount) SetPermissions(val []ServiceAccountPermission) {
+	s.Permissions = val
+}
 
 // CreateServiceAccountInPortfolioBadRequest is response for CreateServiceAccountInPortfolio operation.
 type CreateServiceAccountInPortfolioBadRequest struct{}
@@ -1376,6 +1706,26 @@ func (*DeleteEnvironmentOKApplicationJSON) deleteEnvironmentRes() {}
 type DeleteEnvironmentUnauthorized struct{}
 
 func (*DeleteEnvironmentUnauthorized) deleteEnvironmentRes() {}
+
+// DeleteFeatureFilterBadRequest is response for DeleteFeatureFilter operation.
+type DeleteFeatureFilterBadRequest struct{}
+
+func (*DeleteFeatureFilterBadRequest) deleteFeatureFilterRes() {}
+
+// DeleteFeatureFilterConflict is response for DeleteFeatureFilter operation.
+type DeleteFeatureFilterConflict struct{}
+
+func (*DeleteFeatureFilterConflict) deleteFeatureFilterRes() {}
+
+// DeleteFeatureFilterNotFound is response for DeleteFeatureFilter operation.
+type DeleteFeatureFilterNotFound struct{}
+
+func (*DeleteFeatureFilterNotFound) deleteFeatureFilterRes() {}
+
+// DeleteFeatureFilterUnauthorized is response for DeleteFeatureFilter operation.
+type DeleteFeatureFilterUnauthorized struct{}
+
+func (*DeleteFeatureFilterUnauthorized) deleteFeatureFilterRes() {}
 
 // DeleteFeatureForApplicationBadRequest is response for DeleteFeatureForApplication operation.
 type DeleteFeatureForApplicationBadRequest struct{}
@@ -1541,13 +1891,13 @@ type Environment struct {
 	Version            OptInt64       `json:"version"`
 	Description        OptNilString   `json:"description"`
 	// Is this a production environment?.
-	Production               OptNilBool                              `json:"production"`
-	GroupRoles               OptNilEnvironmentGroupRoleArray         `json:"groupRoles"`
-	Features                 OptNilFeatureArray                      `json:"features"`
-	EnvironmentInfo          OptNilEnvironmentEnvironmentInfo        `json:"environmentInfo"`
-	WebhookEnvironmentInfo   OptNilEnvironmentWebhookEnvironmentInfo `json:"webhookEnvironmentInfo"`
-	ServiceAccountPermission OptNilServiceAccountPermissionArray     `json:"serviceAccountPermission"`
-	WhenArchived             OptNilDateTime                          `json:"whenArchived"`
+	Production               OptNilBool                          `json:"production"`
+	GroupRoles               OptNilEnvironmentGroupRoleArray     `json:"groupRoles"`
+	Features                 OptNilFeatureArray                  `json:"features"`
+	EnvironmentInfo          jx.Raw                              `json:"environmentInfo"`
+	WebhookEnvironmentInfo   jx.Raw                              `json:"webhookEnvironmentInfo"`
+	ServiceAccountPermission OptNilServiceAccountPermissionArray `json:"serviceAccountPermission"`
+	WhenArchived             OptNilDateTime                      `json:"whenArchived"`
 }
 
 // GetCreatedBy returns the value of CreatedBy.
@@ -1616,12 +1966,12 @@ func (s *Environment) GetFeatures() OptNilFeatureArray {
 }
 
 // GetEnvironmentInfo returns the value of EnvironmentInfo.
-func (s *Environment) GetEnvironmentInfo() OptNilEnvironmentEnvironmentInfo {
+func (s *Environment) GetEnvironmentInfo() jx.Raw {
 	return s.EnvironmentInfo
 }
 
 // GetWebhookEnvironmentInfo returns the value of WebhookEnvironmentInfo.
-func (s *Environment) GetWebhookEnvironmentInfo() OptNilEnvironmentWebhookEnvironmentInfo {
+func (s *Environment) GetWebhookEnvironmentInfo() jx.Raw {
 	return s.WebhookEnvironmentInfo
 }
 
@@ -1701,12 +2051,12 @@ func (s *Environment) SetFeatures(val OptNilFeatureArray) {
 }
 
 // SetEnvironmentInfo sets the value of EnvironmentInfo.
-func (s *Environment) SetEnvironmentInfo(val OptNilEnvironmentEnvironmentInfo) {
+func (s *Environment) SetEnvironmentInfo(val jx.Raw) {
 	s.EnvironmentInfo = val
 }
 
 // SetWebhookEnvironmentInfo sets the value of WebhookEnvironmentInfo.
-func (s *Environment) SetWebhookEnvironmentInfo(val OptNilEnvironmentWebhookEnvironmentInfo) {
+func (s *Environment) SetWebhookEnvironmentInfo(val jx.Raw) {
 	s.WebhookEnvironmentInfo = val
 }
 
@@ -1727,22 +2077,153 @@ func (*Environment) updateEnvironmentOnApplicationRes() {}
 func (*Environment) updateEnvironmentRes()              {}
 func (*Environment) updateEnvironmentV2Res()            {}
 
-type EnvironmentEnvironmentInfo map[string]string
-
-func (s *EnvironmentEnvironmentInfo) init() EnvironmentEnvironmentInfo {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
+// Ref: #/components/schemas/EnvironmentFeatureValues
+type EnvironmentFeatureValues struct {
+	EnvironmentId      OptUUID    `json:"environmentId"`
+	EnvironmentName    OptString  `json:"environmentName"`
+	PriorEnvironmentId OptNilUUID `json:"priorEnvironmentId"`
+	// The values of the features depending on access.
+	Features []FeatureValue `json:"features"`
+	// The roles of this person in this environment.
+	Roles []RoleType `json:"roles"`
 }
 
-type EnvironmentFeaturesResult jx.Raw
+// GetEnvironmentId returns the value of EnvironmentId.
+func (s *EnvironmentFeatureValues) GetEnvironmentId() OptUUID {
+	return s.EnvironmentId
+}
+
+// GetEnvironmentName returns the value of EnvironmentName.
+func (s *EnvironmentFeatureValues) GetEnvironmentName() OptString {
+	return s.EnvironmentName
+}
+
+// GetPriorEnvironmentId returns the value of PriorEnvironmentId.
+func (s *EnvironmentFeatureValues) GetPriorEnvironmentId() OptNilUUID {
+	return s.PriorEnvironmentId
+}
+
+// GetFeatures returns the value of Features.
+func (s *EnvironmentFeatureValues) GetFeatures() []FeatureValue {
+	return s.Features
+}
+
+// GetRoles returns the value of Roles.
+func (s *EnvironmentFeatureValues) GetRoles() []RoleType {
+	return s.Roles
+}
+
+// SetEnvironmentId sets the value of EnvironmentId.
+func (s *EnvironmentFeatureValues) SetEnvironmentId(val OptUUID) {
+	s.EnvironmentId = val
+}
+
+// SetEnvironmentName sets the value of EnvironmentName.
+func (s *EnvironmentFeatureValues) SetEnvironmentName(val OptString) {
+	s.EnvironmentName = val
+}
+
+// SetPriorEnvironmentId sets the value of PriorEnvironmentId.
+func (s *EnvironmentFeatureValues) SetPriorEnvironmentId(val OptNilUUID) {
+	s.PriorEnvironmentId = val
+}
+
+// SetFeatures sets the value of Features.
+func (s *EnvironmentFeatureValues) SetFeatures(val []FeatureValue) {
+	s.Features = val
+}
+
+// SetRoles sets the value of Roles.
+func (s *EnvironmentFeatureValues) SetRoles(val []RoleType) {
+	s.Roles = val
+}
+
+// Ref: #/components/schemas/EnvironmentFeaturesResult
+type EnvironmentFeaturesResult struct {
+	FeatureValues []FeatureValue `json:"featureValues"`
+	Environments  []Environment  `json:"environments"`
+	Applications  []Application  `json:"applications"`
+	Features      []Feature      `json:"features"`
+}
+
+// GetFeatureValues returns the value of FeatureValues.
+func (s *EnvironmentFeaturesResult) GetFeatureValues() []FeatureValue {
+	return s.FeatureValues
+}
+
+// GetEnvironments returns the value of Environments.
+func (s *EnvironmentFeaturesResult) GetEnvironments() []Environment {
+	return s.Environments
+}
+
+// GetApplications returns the value of Applications.
+func (s *EnvironmentFeaturesResult) GetApplications() []Application {
+	return s.Applications
+}
+
+// GetFeatures returns the value of Features.
+func (s *EnvironmentFeaturesResult) GetFeatures() []Feature {
+	return s.Features
+}
+
+// SetFeatureValues sets the value of FeatureValues.
+func (s *EnvironmentFeaturesResult) SetFeatureValues(val []FeatureValue) {
+	s.FeatureValues = val
+}
+
+// SetEnvironments sets the value of Environments.
+func (s *EnvironmentFeaturesResult) SetEnvironments(val []Environment) {
+	s.Environments = val
+}
+
+// SetApplications sets the value of Applications.
+func (s *EnvironmentFeaturesResult) SetApplications(val []Application) {
+	s.Applications = val
+}
+
+// SetFeatures sets the value of Features.
+func (s *EnvironmentFeaturesResult) SetFeatures(val []Feature) {
+	s.Features = val
+}
 
 func (*EnvironmentFeaturesResult) getFeaturesForEnvironmentRes() {}
 
-type EnvironmentGroupRole jx.Raw
+// Ref: #/components/schemas/EnvironmentGroupRole
+type EnvironmentGroupRole struct {
+	EnvironmentId uuid.UUID  `json:"environmentId"`
+	GroupId       uuid.UUID  `json:"groupId"`
+	Roles         []RoleType `json:"roles"`
+}
+
+// GetEnvironmentId returns the value of EnvironmentId.
+func (s *EnvironmentGroupRole) GetEnvironmentId() uuid.UUID {
+	return s.EnvironmentId
+}
+
+// GetGroupId returns the value of GroupId.
+func (s *EnvironmentGroupRole) GetGroupId() uuid.UUID {
+	return s.GroupId
+}
+
+// GetRoles returns the value of Roles.
+func (s *EnvironmentGroupRole) GetRoles() []RoleType {
+	return s.Roles
+}
+
+// SetEnvironmentId sets the value of EnvironmentId.
+func (s *EnvironmentGroupRole) SetEnvironmentId(val uuid.UUID) {
+	s.EnvironmentId = val
+}
+
+// SetGroupId sets the value of GroupId.
+func (s *EnvironmentGroupRole) SetGroupId(val uuid.UUID) {
+	s.GroupId = val
+}
+
+// SetRoles sets the value of Roles.
+func (s *EnvironmentGroupRole) SetRoles(val []RoleType) {
+	s.Roles = val
+}
 
 // EnvironmentOrderingBadRequest is response for EnvironmentOrdering operation.
 type EnvironmentOrderingBadRequest struct{}
@@ -1854,22 +2335,267 @@ func (s *EnvironmentSortOrder) UnmarshalText(data []byte) error {
 	}
 }
 
-type EnvironmentWebhookEnvironmentInfo map[string]string
-
-func (s *EnvironmentWebhookEnvironmentInfo) init() EnvironmentWebhookEnvironmentInfo {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
+// Exists simply to hold the name of the feature as it exists across all environments.
+// Ref: #/components/schemas/Feature
+type Feature struct {
+	ID OptNilUUID `json:"id"`
+	// Unique within this application.
+	Key OptString `json:"key"`
+	// Use this in code, as then people cannot guess your new features from their names.
+	Alias OptNilString `json:"alias"`
+	Link  OptNilString `json:"link"`
+	// Description if any.
+	Name      string              `json:"name"`
+	ValueType OptFeatureValueType `json:"valueType"`
+	// Used for optimistic locking when renaming a feature.
+	Version      OptInt64       `json:"version"`
+	WhenArchived OptNilDateTime `json:"whenArchived"`
+	// Should the config remain invisible to users without secret permission.
+	Secret      OptNilBool   `json:"secret"`
+	Description OptNilString `json:"description"`
+	// Metadata that may need to be stored. Intended for ADK use. No data limit on FHOS. 10k on SaaS.
+	// (stored as CLOB).
+	MetaData OptNilString `json:"metaData"`
+	// The ID's of Filters associated with this feature.
+	FeatureFilter OptNilUUIDArray `json:"featureFilter"`
 }
 
-type Feature jx.Raw
+// GetID returns the value of ID.
+func (s *Feature) GetID() OptNilUUID {
+	return s.ID
+}
+
+// GetKey returns the value of Key.
+func (s *Feature) GetKey() OptString {
+	return s.Key
+}
+
+// GetAlias returns the value of Alias.
+func (s *Feature) GetAlias() OptNilString {
+	return s.Alias
+}
+
+// GetLink returns the value of Link.
+func (s *Feature) GetLink() OptNilString {
+	return s.Link
+}
+
+// GetName returns the value of Name.
+func (s *Feature) GetName() string {
+	return s.Name
+}
+
+// GetValueType returns the value of ValueType.
+func (s *Feature) GetValueType() OptFeatureValueType {
+	return s.ValueType
+}
+
+// GetVersion returns the value of Version.
+func (s *Feature) GetVersion() OptInt64 {
+	return s.Version
+}
+
+// GetWhenArchived returns the value of WhenArchived.
+func (s *Feature) GetWhenArchived() OptNilDateTime {
+	return s.WhenArchived
+}
+
+// GetSecret returns the value of Secret.
+func (s *Feature) GetSecret() OptNilBool {
+	return s.Secret
+}
+
+// GetDescription returns the value of Description.
+func (s *Feature) GetDescription() OptNilString {
+	return s.Description
+}
+
+// GetMetaData returns the value of MetaData.
+func (s *Feature) GetMetaData() OptNilString {
+	return s.MetaData
+}
+
+// GetFeatureFilter returns the value of FeatureFilter.
+func (s *Feature) GetFeatureFilter() OptNilUUIDArray {
+	return s.FeatureFilter
+}
+
+// SetID sets the value of ID.
+func (s *Feature) SetID(val OptNilUUID) {
+	s.ID = val
+}
+
+// SetKey sets the value of Key.
+func (s *Feature) SetKey(val OptString) {
+	s.Key = val
+}
+
+// SetAlias sets the value of Alias.
+func (s *Feature) SetAlias(val OptNilString) {
+	s.Alias = val
+}
+
+// SetLink sets the value of Link.
+func (s *Feature) SetLink(val OptNilString) {
+	s.Link = val
+}
+
+// SetName sets the value of Name.
+func (s *Feature) SetName(val string) {
+	s.Name = val
+}
+
+// SetValueType sets the value of ValueType.
+func (s *Feature) SetValueType(val OptFeatureValueType) {
+	s.ValueType = val
+}
+
+// SetVersion sets the value of Version.
+func (s *Feature) SetVersion(val OptInt64) {
+	s.Version = val
+}
+
+// SetWhenArchived sets the value of WhenArchived.
+func (s *Feature) SetWhenArchived(val OptNilDateTime) {
+	s.WhenArchived = val
+}
+
+// SetSecret sets the value of Secret.
+func (s *Feature) SetSecret(val OptNilBool) {
+	s.Secret = val
+}
+
+// SetDescription sets the value of Description.
+func (s *Feature) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
+// SetMetaData sets the value of MetaData.
+func (s *Feature) SetMetaData(val OptNilString) {
+	s.MetaData = val
+}
+
+// SetFeatureFilter sets the value of FeatureFilter.
+func (s *Feature) SetFeatureFilter(val OptNilUUIDArray) {
+	s.FeatureFilter = val
+}
 
 func (*Feature) getFeatureByKeyRes() {}
 
-type FeatureEnvironment jx.Raw
+// Ref: #/components/schemas/FeatureEnvironment
+type FeatureEnvironment struct {
+	Environment OptEnvironment `json:"environment"`
+	// The roles of this person in this environment.
+	Roles           []RoleType         `json:"roles"`
+	FeatureValue    OptNilFeatureValue `json:"featureValue"`
+	ServiceAccounts []ServiceAccount   `json:"serviceAccounts"`
+}
+
+// GetEnvironment returns the value of Environment.
+func (s *FeatureEnvironment) GetEnvironment() OptEnvironment {
+	return s.Environment
+}
+
+// GetRoles returns the value of Roles.
+func (s *FeatureEnvironment) GetRoles() []RoleType {
+	return s.Roles
+}
+
+// GetFeatureValue returns the value of FeatureValue.
+func (s *FeatureEnvironment) GetFeatureValue() OptNilFeatureValue {
+	return s.FeatureValue
+}
+
+// GetServiceAccounts returns the value of ServiceAccounts.
+func (s *FeatureEnvironment) GetServiceAccounts() []ServiceAccount {
+	return s.ServiceAccounts
+}
+
+// SetEnvironment sets the value of Environment.
+func (s *FeatureEnvironment) SetEnvironment(val OptEnvironment) {
+	s.Environment = val
+}
+
+// SetRoles sets the value of Roles.
+func (s *FeatureEnvironment) SetRoles(val []RoleType) {
+	s.Roles = val
+}
+
+// SetFeatureValue sets the value of FeatureValue.
+func (s *FeatureEnvironment) SetFeatureValue(val OptNilFeatureValue) {
+	s.FeatureValue = val
+}
+
+// SetServiceAccounts sets the value of ServiceAccounts.
+func (s *FeatureEnvironment) SetServiceAccounts(val []ServiceAccount) {
+	s.ServiceAccounts = val
+}
+
+// A filter used by an API key to determine what kind of features it should send to the client.
+// Ref: #/components/schemas/FeatureFilter
+type FeatureFilter struct {
+	ID uuid.UUID `json:"id"`
+	// Unique within this portfolio.
+	Name        string             `json:"name"`
+	Description OptNilString       `json:"description"`
+	Version     int                `json:"version"`
+	WhoCreated  OptNilAnemicPerson `json:"whoCreated"`
+}
+
+// GetID returns the value of ID.
+func (s *FeatureFilter) GetID() uuid.UUID {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *FeatureFilter) GetName() string {
+	return s.Name
+}
+
+// GetDescription returns the value of Description.
+func (s *FeatureFilter) GetDescription() OptNilString {
+	return s.Description
+}
+
+// GetVersion returns the value of Version.
+func (s *FeatureFilter) GetVersion() int {
+	return s.Version
+}
+
+// GetWhoCreated returns the value of WhoCreated.
+func (s *FeatureFilter) GetWhoCreated() OptNilAnemicPerson {
+	return s.WhoCreated
+}
+
+// SetID sets the value of ID.
+func (s *FeatureFilter) SetID(val uuid.UUID) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *FeatureFilter) SetName(val string) {
+	s.Name = val
+}
+
+// SetDescription sets the value of Description.
+func (s *FeatureFilter) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
+// SetVersion sets the value of Version.
+func (s *FeatureFilter) SetVersion(val int) {
+	s.Version = val
+}
+
+// SetWhoCreated sets the value of WhoCreated.
+func (s *FeatureFilter) SetWhoCreated(val OptNilAnemicPerson) {
+	s.WhoCreated = val
+}
+
+func (*FeatureFilter) createFeatureFilterRes() {}
+func (*FeatureFilter) deleteFeatureFilterRes() {}
+func (*FeatureFilter) getFeatureFilterRes()    {}
+func (*FeatureFilter) updateFeatureFilterRes() {}
 
 // Ref: #/components/schemas/FeatureGroup
 type FeatureGroup struct {
@@ -2610,7 +3336,223 @@ func (s *FeatureHistoryValue) SetRolloutStrategies(val []RolloutStrategy) {
 	s.RolloutStrategies = val
 }
 
-type FeatureValue jx.Raw
+// Ref: #/components/schemas/FeatureValue
+type FeatureValue struct {
+	ID     OptNilUUID `json:"id"`
+	Key    string     `json:"key"`
+	Locked bool       `json:"locked"`
+	// Preferred now, please don't use valueX fields.
+	Value jx.Raw `json:"value"`
+	// Default value if no strategy matches. interpreted by type in parent.
+	//
+	// Deprecated: schema marks this property as deprecated.
+	ValueString OptNilString `json:"valueString"`
+	// Deprecated: schema marks this property as deprecated.
+	ValueNumber OptNilFloat64 `json:"valueNumber"`
+	// Deprecated: schema marks this property as deprecated.
+	ValueBoolean OptNilBool `json:"valueBoolean"`
+	// Deprecated: schema marks this property as deprecated.
+	ValueJson OptNilString `json:"valueJson"`
+	// If false or null, this feature will visible on edge. if true, it will not be passed to the client.
+	Retired                  OptBool                            `json:"retired"`
+	RolloutStrategyInstances OptNilRolloutStrategyInstanceArray `json:"rolloutStrategyInstances"`
+	// These are custom rollout strategies that only apply to this feature value.
+	RolloutStrategies OptNilRolloutStrategyArray `json:"rolloutStrategies"`
+	// This is list is either provided empty (when publishing) or anemic so the MR will client will
+	// understand which shared strategies are attached without having to back-call. If provided then it
+	// will mirror rolloutStrategyInstances and only enabled ones will be passed back. The value from the
+	// rolloutStrategyInstance will be embedded. This field will _always_ be ignored when being sent back
+	// to the server, only rolloutStrategyInstances is used.
+	SharedRolloutStrategies OptNilRolloutStrategyArray `json:"sharedRolloutStrategies"`
+	// There are strategies provided by feature groups (if any).
+	FeatureGroupStrategies OptNilThinGroupRolloutStrategyArray `json:"featureGroupStrategies"`
+	EnvironmentId          OptNilUUID                          `json:"environmentId"`
+	// Used for optimistic locking. we set it to 0 for the initial version.
+	Version     OptInt64       `json:"version"`
+	WhoUpdated  OptNilPerson   `json:"whoUpdated"`
+	WhenUpdated OptNilDateTime `json:"whenUpdated"`
+	WhatUpdated OptNilString   `json:"whatUpdated"`
+}
+
+// GetID returns the value of ID.
+func (s *FeatureValue) GetID() OptNilUUID {
+	return s.ID
+}
+
+// GetKey returns the value of Key.
+func (s *FeatureValue) GetKey() string {
+	return s.Key
+}
+
+// GetLocked returns the value of Locked.
+func (s *FeatureValue) GetLocked() bool {
+	return s.Locked
+}
+
+// GetValue returns the value of Value.
+func (s *FeatureValue) GetValue() jx.Raw {
+	return s.Value
+}
+
+// GetValueString returns the value of ValueString.
+func (s *FeatureValue) GetValueString() OptNilString {
+	return s.ValueString
+}
+
+// GetValueNumber returns the value of ValueNumber.
+func (s *FeatureValue) GetValueNumber() OptNilFloat64 {
+	return s.ValueNumber
+}
+
+// GetValueBoolean returns the value of ValueBoolean.
+func (s *FeatureValue) GetValueBoolean() OptNilBool {
+	return s.ValueBoolean
+}
+
+// GetValueJson returns the value of ValueJson.
+func (s *FeatureValue) GetValueJson() OptNilString {
+	return s.ValueJson
+}
+
+// GetRetired returns the value of Retired.
+func (s *FeatureValue) GetRetired() OptBool {
+	return s.Retired
+}
+
+// GetRolloutStrategyInstances returns the value of RolloutStrategyInstances.
+func (s *FeatureValue) GetRolloutStrategyInstances() OptNilRolloutStrategyInstanceArray {
+	return s.RolloutStrategyInstances
+}
+
+// GetRolloutStrategies returns the value of RolloutStrategies.
+func (s *FeatureValue) GetRolloutStrategies() OptNilRolloutStrategyArray {
+	return s.RolloutStrategies
+}
+
+// GetSharedRolloutStrategies returns the value of SharedRolloutStrategies.
+func (s *FeatureValue) GetSharedRolloutStrategies() OptNilRolloutStrategyArray {
+	return s.SharedRolloutStrategies
+}
+
+// GetFeatureGroupStrategies returns the value of FeatureGroupStrategies.
+func (s *FeatureValue) GetFeatureGroupStrategies() OptNilThinGroupRolloutStrategyArray {
+	return s.FeatureGroupStrategies
+}
+
+// GetEnvironmentId returns the value of EnvironmentId.
+func (s *FeatureValue) GetEnvironmentId() OptNilUUID {
+	return s.EnvironmentId
+}
+
+// GetVersion returns the value of Version.
+func (s *FeatureValue) GetVersion() OptInt64 {
+	return s.Version
+}
+
+// GetWhoUpdated returns the value of WhoUpdated.
+func (s *FeatureValue) GetWhoUpdated() OptNilPerson {
+	return s.WhoUpdated
+}
+
+// GetWhenUpdated returns the value of WhenUpdated.
+func (s *FeatureValue) GetWhenUpdated() OptNilDateTime {
+	return s.WhenUpdated
+}
+
+// GetWhatUpdated returns the value of WhatUpdated.
+func (s *FeatureValue) GetWhatUpdated() OptNilString {
+	return s.WhatUpdated
+}
+
+// SetID sets the value of ID.
+func (s *FeatureValue) SetID(val OptNilUUID) {
+	s.ID = val
+}
+
+// SetKey sets the value of Key.
+func (s *FeatureValue) SetKey(val string) {
+	s.Key = val
+}
+
+// SetLocked sets the value of Locked.
+func (s *FeatureValue) SetLocked(val bool) {
+	s.Locked = val
+}
+
+// SetValue sets the value of Value.
+func (s *FeatureValue) SetValue(val jx.Raw) {
+	s.Value = val
+}
+
+// SetValueString sets the value of ValueString.
+func (s *FeatureValue) SetValueString(val OptNilString) {
+	s.ValueString = val
+}
+
+// SetValueNumber sets the value of ValueNumber.
+func (s *FeatureValue) SetValueNumber(val OptNilFloat64) {
+	s.ValueNumber = val
+}
+
+// SetValueBoolean sets the value of ValueBoolean.
+func (s *FeatureValue) SetValueBoolean(val OptNilBool) {
+	s.ValueBoolean = val
+}
+
+// SetValueJson sets the value of ValueJson.
+func (s *FeatureValue) SetValueJson(val OptNilString) {
+	s.ValueJson = val
+}
+
+// SetRetired sets the value of Retired.
+func (s *FeatureValue) SetRetired(val OptBool) {
+	s.Retired = val
+}
+
+// SetRolloutStrategyInstances sets the value of RolloutStrategyInstances.
+func (s *FeatureValue) SetRolloutStrategyInstances(val OptNilRolloutStrategyInstanceArray) {
+	s.RolloutStrategyInstances = val
+}
+
+// SetRolloutStrategies sets the value of RolloutStrategies.
+func (s *FeatureValue) SetRolloutStrategies(val OptNilRolloutStrategyArray) {
+	s.RolloutStrategies = val
+}
+
+// SetSharedRolloutStrategies sets the value of SharedRolloutStrategies.
+func (s *FeatureValue) SetSharedRolloutStrategies(val OptNilRolloutStrategyArray) {
+	s.SharedRolloutStrategies = val
+}
+
+// SetFeatureGroupStrategies sets the value of FeatureGroupStrategies.
+func (s *FeatureValue) SetFeatureGroupStrategies(val OptNilThinGroupRolloutStrategyArray) {
+	s.FeatureGroupStrategies = val
+}
+
+// SetEnvironmentId sets the value of EnvironmentId.
+func (s *FeatureValue) SetEnvironmentId(val OptNilUUID) {
+	s.EnvironmentId = val
+}
+
+// SetVersion sets the value of Version.
+func (s *FeatureValue) SetVersion(val OptInt64) {
+	s.Version = val
+}
+
+// SetWhoUpdated sets the value of WhoUpdated.
+func (s *FeatureValue) SetWhoUpdated(val OptNilPerson) {
+	s.WhoUpdated = val
+}
+
+// SetWhenUpdated sets the value of WhenUpdated.
+func (s *FeatureValue) SetWhenUpdated(val OptNilDateTime) {
+	s.WhenUpdated = val
+}
+
+// SetWhatUpdated sets the value of WhatUpdated.
+func (s *FeatureValue) SetWhatUpdated(val OptNilString) {
+	s.WhatUpdated = val
+}
 
 func (*FeatureValue) createFeatureForEnvironmentRes() {}
 func (*FeatureValue) getFeatureForEnvironmentRes()    {}
@@ -2722,6 +3664,16 @@ func (*FindEnvironmentsOKApplicationJSON) findEnvironmentsRes() {}
 type FindEnvironmentsUnauthorized struct{}
 
 func (*FindEnvironmentsUnauthorized) findEnvironmentsRes() {}
+
+// FindFeatureFiltersBadRequest is response for FindFeatureFilters operation.
+type FindFeatureFiltersBadRequest struct{}
+
+func (*FindFeatureFiltersBadRequest) findFeatureFiltersRes() {}
+
+// FindFeatureFiltersUnauthorized is response for FindFeatureFilters operation.
+type FindFeatureFiltersUnauthorized struct{}
+
+func (*FindFeatureFiltersUnauthorized) findFeatureFiltersRes() {}
 
 // FindGroupsBadRequest is response for FindGroups operation.
 type FindGroupsBadRequest struct{}
@@ -2882,6 +3834,26 @@ type GetFeatureByKeyUnauthorized struct{}
 
 func (*GetFeatureByKeyUnauthorized) getFeatureByKeyRes() {}
 
+// GetFeatureFilterBadRequest is response for GetFeatureFilter operation.
+type GetFeatureFilterBadRequest struct{}
+
+func (*GetFeatureFilterBadRequest) getFeatureFilterRes() {}
+
+// GetFeatureFilterConflict is response for GetFeatureFilter operation.
+type GetFeatureFilterConflict struct{}
+
+func (*GetFeatureFilterConflict) getFeatureFilterRes() {}
+
+// GetFeatureFilterNotFound is response for GetFeatureFilter operation.
+type GetFeatureFilterNotFound struct{}
+
+func (*GetFeatureFilterNotFound) getFeatureFilterRes() {}
+
+// GetFeatureFilterUnauthorized is response for GetFeatureFilter operation.
+type GetFeatureFilterUnauthorized struct{}
+
+func (*GetFeatureFilterUnauthorized) getFeatureFilterRes() {}
+
 // GetFeatureForEnvironmentBadRequest is response for GetFeatureForEnvironment operation.
 type GetFeatureForEnvironmentBadRequest struct{}
 
@@ -2995,6 +3967,16 @@ func (*GetLoginUrlForProviderNotFound) getLoginUrlForProviderRes() {}
 type GetLoginUrlForProviderUnauthorized struct{}
 
 func (*GetLoginUrlForProviderUnauthorized) getLoginUrlForProviderRes() {}
+
+// GetMatchingFiltersBadRequest is response for GetMatchingFilters operation.
+type GetMatchingFiltersBadRequest struct{}
+
+func (*GetMatchingFiltersBadRequest) getMatchingFiltersRes() {}
+
+// GetMatchingFiltersUnauthorized is response for GetMatchingFilters operation.
+type GetMatchingFiltersUnauthorized struct{}
+
+func (*GetMatchingFiltersUnauthorized) getMatchingFiltersRes() {}
 
 // GetPersonBadRequest is response for GetPerson operation.
 type GetPersonBadRequest struct{}
@@ -3645,6 +4627,145 @@ type LogoutUnauthorized struct{}
 
 func (*LogoutUnauthorized) logoutRes() {}
 
+// Ref: #/components/schemas/MatchTypeEnum
+type MatchTypeEnum string
+
+const (
+	MatchTypeEnumApplications    MatchTypeEnum = "applications"
+	MatchTypeEnumServiceaccounts MatchTypeEnum = "serviceaccounts"
+)
+
+// AllValues returns all MatchTypeEnum values.
+func (MatchTypeEnum) AllValues() []MatchTypeEnum {
+	return []MatchTypeEnum{
+		MatchTypeEnumApplications,
+		MatchTypeEnumServiceaccounts,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s MatchTypeEnum) MarshalText() ([]byte, error) {
+	switch s {
+	case MatchTypeEnumApplications:
+		return []byte(s), nil
+	case MatchTypeEnumServiceaccounts:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *MatchTypeEnum) UnmarshalText(data []byte) error {
+	switch MatchTypeEnum(data) {
+	case MatchTypeEnumApplications:
+		*s = MatchTypeEnumApplications
+		return nil
+	case MatchTypeEnumServiceaccounts:
+		*s = MatchTypeEnumServiceaccounts
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/MatchingFilter
+type MatchingFilter struct {
+	ID   OptUUID   `json:"id"`
+	Name OptString `json:"name"`
+}
+
+// GetID returns the value of ID.
+func (s *MatchingFilter) GetID() OptUUID {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *MatchingFilter) GetName() OptString {
+	return s.Name
+}
+
+// SetID sets the value of ID.
+func (s *MatchingFilter) SetID(val OptUUID) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *MatchingFilter) SetName(val OptString) {
+	s.Name = val
+}
+
+// Describes the service account or application and its matching filters, depending on what was
+// requested.
+// Ref: #/components/schemas/MatchingFilterResult
+type MatchingFilterResult struct {
+	Name        OptString    `json:"name"`
+	ID          OptUUID      `json:"id"`
+	Description OptNilString `json:"description"`
+	// The filters that matched those requested. May not be all.
+	MatchingFilters []MatchingFilter `json:"matchingFilters"`
+}
+
+// GetName returns the value of Name.
+func (s *MatchingFilterResult) GetName() OptString {
+	return s.Name
+}
+
+// GetID returns the value of ID.
+func (s *MatchingFilterResult) GetID() OptUUID {
+	return s.ID
+}
+
+// GetDescription returns the value of Description.
+func (s *MatchingFilterResult) GetDescription() OptNilString {
+	return s.Description
+}
+
+// GetMatchingFilters returns the value of MatchingFilters.
+func (s *MatchingFilterResult) GetMatchingFilters() []MatchingFilter {
+	return s.MatchingFilters
+}
+
+// SetName sets the value of Name.
+func (s *MatchingFilterResult) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetID sets the value of ID.
+func (s *MatchingFilterResult) SetID(val OptUUID) {
+	s.ID = val
+}
+
+// SetDescription sets the value of Description.
+func (s *MatchingFilterResult) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
+// SetMatchingFilters sets the value of MatchingFilters.
+func (s *MatchingFilterResult) SetMatchingFilters(val []MatchingFilter) {
+	s.MatchingFilters = val
+}
+
+// When a user requests what service accounts or applications (with features) are available for a
+// list of filters, this is the primary object returned. It is the same return data for service
+// accounts and applications.
+// Ref: #/components/schemas/MatchingFilterResults
+type MatchingFilterResults struct {
+	MatchingResults []MatchingFilterResult `json:"matchingResults"`
+}
+
+// GetMatchingResults returns the value of MatchingResults.
+func (s *MatchingFilterResults) GetMatchingResults() []MatchingFilterResult {
+	return s.MatchingResults
+}
+
+// SetMatchingResults sets the value of MatchingResults.
+func (s *MatchingFilterResults) SetMatchingResults(val []MatchingFilterResult) {
+	s.MatchingResults = val
+}
+
+func (*MatchingFilterResults) getMatchingFiltersRes() {}
+
 // NewNilString returns new NilString with value set to v.
 func NewNilString(v string) NilString {
 	return NilString{
@@ -3874,6 +4995,52 @@ func (o OptDateTime) Or(d time.Time) time.Time {
 	return d
 }
 
+// NewOptEnvironment returns new OptEnvironment with value set to v.
+func NewOptEnvironment(v Environment) OptEnvironment {
+	return OptEnvironment{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptEnvironment is optional Environment.
+type OptEnvironment struct {
+	Value Environment
+	Set   bool
+}
+
+// IsSet returns true if OptEnvironment was set.
+func (o OptEnvironment) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptEnvironment) Reset() {
+	var v Environment
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptEnvironment) SetTo(v Environment) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptEnvironment) Get() (v Environment, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptEnvironment) Or(d Environment) Environment {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptEnvironmentSortOrder returns new OptEnvironmentSortOrder with value set to v.
 func NewOptEnvironmentSortOrder(v EnvironmentSortOrder) OptEnvironmentSortOrder {
 	return OptEnvironmentSortOrder{
@@ -3960,6 +5127,52 @@ func (o OptFeatureHistoryOrder) Get() (v FeatureHistoryOrder, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptFeatureHistoryOrder) Or(d FeatureHistoryOrder) FeatureHistoryOrder {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptFeatureValueType returns new OptFeatureValueType with value set to v.
+func NewOptFeatureValueType(v FeatureValueType) OptFeatureValueType {
+	return OptFeatureValueType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptFeatureValueType is optional FeatureValueType.
+type OptFeatureValueType struct {
+	Value FeatureValueType
+	Set   bool
+}
+
+// IsSet returns true if OptFeatureValueType was set.
+func (o OptFeatureValueType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptFeatureValueType) Reset() {
+	var v FeatureValueType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptFeatureValueType) SetTo(v FeatureValueType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptFeatureValueType) Get() (v FeatureValueType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptFeatureValueType) Or(d FeatureValueType) FeatureValueType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4098,6 +5311,69 @@ func (o OptListApplicationRolloutStrategyItemUser) Get() (v ListApplicationRollo
 
 // Or returns value if set, or given parameter if does not.
 func (o OptListApplicationRolloutStrategyItemUser) Or(d ListApplicationRolloutStrategyItemUser) ListApplicationRolloutStrategyItemUser {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilAnemicPerson returns new OptNilAnemicPerson with value set to v.
+func NewOptNilAnemicPerson(v AnemicPerson) OptNilAnemicPerson {
+	return OptNilAnemicPerson{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilAnemicPerson is optional nullable AnemicPerson.
+type OptNilAnemicPerson struct {
+	Value AnemicPerson
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilAnemicPerson was set.
+func (o OptNilAnemicPerson) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilAnemicPerson) Reset() {
+	var v AnemicPerson
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilAnemicPerson) SetTo(v AnemicPerson) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilAnemicPerson) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilAnemicPerson) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v AnemicPerson
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilAnemicPerson) Get() (v AnemicPerson, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilAnemicPerson) Or(d AnemicPerson) AnemicPerson {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4293,69 +5569,6 @@ func (o OptNilBool) Or(d bool) bool {
 	return d
 }
 
-// NewOptNilCreateEnvironmentEnvironmentInfo returns new OptNilCreateEnvironmentEnvironmentInfo with value set to v.
-func NewOptNilCreateEnvironmentEnvironmentInfo(v CreateEnvironmentEnvironmentInfo) OptNilCreateEnvironmentEnvironmentInfo {
-	return OptNilCreateEnvironmentEnvironmentInfo{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilCreateEnvironmentEnvironmentInfo is optional nullable CreateEnvironmentEnvironmentInfo.
-type OptNilCreateEnvironmentEnvironmentInfo struct {
-	Value CreateEnvironmentEnvironmentInfo
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilCreateEnvironmentEnvironmentInfo was set.
-func (o OptNilCreateEnvironmentEnvironmentInfo) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilCreateEnvironmentEnvironmentInfo) Reset() {
-	var v CreateEnvironmentEnvironmentInfo
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilCreateEnvironmentEnvironmentInfo) SetTo(v CreateEnvironmentEnvironmentInfo) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilCreateEnvironmentEnvironmentInfo) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilCreateEnvironmentEnvironmentInfo) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v CreateEnvironmentEnvironmentInfo
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilCreateEnvironmentEnvironmentInfo) Get() (v CreateEnvironmentEnvironmentInfo, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilCreateEnvironmentEnvironmentInfo) Or(d CreateEnvironmentEnvironmentInfo) CreateEnvironmentEnvironmentInfo {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptNilDateTime returns new OptNilDateTime with value set to v.
 func NewOptNilDateTime(v time.Time) OptNilDateTime {
 	return OptNilDateTime{
@@ -4419,69 +5632,6 @@ func (o OptNilDateTime) Or(d time.Time) time.Time {
 	return d
 }
 
-// NewOptNilEnvironmentEnvironmentInfo returns new OptNilEnvironmentEnvironmentInfo with value set to v.
-func NewOptNilEnvironmentEnvironmentInfo(v EnvironmentEnvironmentInfo) OptNilEnvironmentEnvironmentInfo {
-	return OptNilEnvironmentEnvironmentInfo{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilEnvironmentEnvironmentInfo is optional nullable EnvironmentEnvironmentInfo.
-type OptNilEnvironmentEnvironmentInfo struct {
-	Value EnvironmentEnvironmentInfo
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilEnvironmentEnvironmentInfo was set.
-func (o OptNilEnvironmentEnvironmentInfo) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilEnvironmentEnvironmentInfo) Reset() {
-	var v EnvironmentEnvironmentInfo
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilEnvironmentEnvironmentInfo) SetTo(v EnvironmentEnvironmentInfo) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilEnvironmentEnvironmentInfo) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilEnvironmentEnvironmentInfo) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v EnvironmentEnvironmentInfo
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilEnvironmentEnvironmentInfo) Get() (v EnvironmentEnvironmentInfo, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilEnvironmentEnvironmentInfo) Or(d EnvironmentEnvironmentInfo) EnvironmentEnvironmentInfo {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptNilEnvironmentGroupRoleArray returns new OptNilEnvironmentGroupRoleArray with value set to v.
 func NewOptNilEnvironmentGroupRoleArray(v []EnvironmentGroupRole) OptNilEnvironmentGroupRoleArray {
 	return OptNilEnvironmentGroupRoleArray{
@@ -4539,69 +5689,6 @@ func (o OptNilEnvironmentGroupRoleArray) Get() (v []EnvironmentGroupRole, ok boo
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilEnvironmentGroupRoleArray) Or(d []EnvironmentGroupRole) []EnvironmentGroupRole {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilEnvironmentWebhookEnvironmentInfo returns new OptNilEnvironmentWebhookEnvironmentInfo with value set to v.
-func NewOptNilEnvironmentWebhookEnvironmentInfo(v EnvironmentWebhookEnvironmentInfo) OptNilEnvironmentWebhookEnvironmentInfo {
-	return OptNilEnvironmentWebhookEnvironmentInfo{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilEnvironmentWebhookEnvironmentInfo is optional nullable EnvironmentWebhookEnvironmentInfo.
-type OptNilEnvironmentWebhookEnvironmentInfo struct {
-	Value EnvironmentWebhookEnvironmentInfo
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilEnvironmentWebhookEnvironmentInfo was set.
-func (o OptNilEnvironmentWebhookEnvironmentInfo) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilEnvironmentWebhookEnvironmentInfo) Reset() {
-	var v EnvironmentWebhookEnvironmentInfo
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilEnvironmentWebhookEnvironmentInfo) SetTo(v EnvironmentWebhookEnvironmentInfo) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilEnvironmentWebhookEnvironmentInfo) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilEnvironmentWebhookEnvironmentInfo) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v EnvironmentWebhookEnvironmentInfo
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilEnvironmentWebhookEnvironmentInfo) Get() (v EnvironmentWebhookEnvironmentInfo, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilEnvironmentWebhookEnvironmentInfo) Or(d EnvironmentWebhookEnvironmentInfo) EnvironmentWebhookEnvironmentInfo {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4728,6 +5815,132 @@ func (o OptNilFeatureGroupUpdateFeatureArray) Get() (v []FeatureGroupUpdateFeatu
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilFeatureGroupUpdateFeatureArray) Or(d []FeatureGroupUpdateFeature) []FeatureGroupUpdateFeature {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilFeatureValue returns new OptNilFeatureValue with value set to v.
+func NewOptNilFeatureValue(v FeatureValue) OptNilFeatureValue {
+	return OptNilFeatureValue{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilFeatureValue is optional nullable FeatureValue.
+type OptNilFeatureValue struct {
+	Value FeatureValue
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilFeatureValue was set.
+func (o OptNilFeatureValue) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilFeatureValue) Reset() {
+	var v FeatureValue
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilFeatureValue) SetTo(v FeatureValue) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilFeatureValue) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilFeatureValue) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v FeatureValue
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilFeatureValue) Get() (v FeatureValue, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilFeatureValue) Or(d FeatureValue) FeatureValue {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilFloat64 returns new OptNilFloat64 with value set to v.
+func NewOptNilFloat64(v float64) OptNilFloat64 {
+	return OptNilFloat64{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilFloat64 is optional nullable float64.
+type OptNilFloat64 struct {
+	Value float64
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilFloat64 was set.
+func (o OptNilFloat64) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilFloat64) Reset() {
+	var v float64
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilFloat64) SetTo(v float64) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilFloat64) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilFloat64) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v float64
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilFloat64) Get() (v float64, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilFloat64) Or(d float64) float64 {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -5049,6 +6262,69 @@ func (o OptNilPerson) Or(d Person) Person {
 	return d
 }
 
+// NewOptNilPersonId returns new OptNilPersonId with value set to v.
+func NewOptNilPersonId(v PersonId) OptNilPersonId {
+	return OptNilPersonId{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilPersonId is optional nullable PersonId.
+type OptNilPersonId struct {
+	Value PersonId
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilPersonId was set.
+func (o OptNilPersonId) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilPersonId) Reset() {
+	var v PersonId
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilPersonId) SetTo(v PersonId) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilPersonId) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilPersonId) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v PersonId
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilPersonId) Get() (v PersonId, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilPersonId) Or(d PersonId) PersonId {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilPersonInfoArray returns new OptNilPersonInfoArray with value set to v.
 func NewOptNilPersonInfoArray(v []PersonInfo) OptNilPersonInfoArray {
 	return OptNilPersonInfoArray{
@@ -5238,6 +6514,69 @@ func (o OptNilPortfolioArray) Or(d []Portfolio) []Portfolio {
 	return d
 }
 
+// NewOptNilRolloutStrategyArray returns new OptNilRolloutStrategyArray with value set to v.
+func NewOptNilRolloutStrategyArray(v []RolloutStrategy) OptNilRolloutStrategyArray {
+	return OptNilRolloutStrategyArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilRolloutStrategyArray is optional nullable []RolloutStrategy.
+type OptNilRolloutStrategyArray struct {
+	Value []RolloutStrategy
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilRolloutStrategyArray was set.
+func (o OptNilRolloutStrategyArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilRolloutStrategyArray) Reset() {
+	var v []RolloutStrategy
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilRolloutStrategyArray) SetTo(v []RolloutStrategy) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilRolloutStrategyArray) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilRolloutStrategyArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []RolloutStrategy
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilRolloutStrategyArray) Get() (v []RolloutStrategy, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilRolloutStrategyArray) Or(d []RolloutStrategy) []RolloutStrategy {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilRolloutStrategyAttributeArray returns new OptNilRolloutStrategyAttributeArray with value set to v.
 func NewOptNilRolloutStrategyAttributeArray(v []RolloutStrategyAttribute) OptNilRolloutStrategyAttributeArray {
 	return OptNilRolloutStrategyAttributeArray{
@@ -5301,6 +6640,321 @@ func (o OptNilRolloutStrategyAttributeArray) Or(d []RolloutStrategyAttribute) []
 	return d
 }
 
+// NewOptNilRolloutStrategyInstanceArray returns new OptNilRolloutStrategyInstanceArray with value set to v.
+func NewOptNilRolloutStrategyInstanceArray(v []RolloutStrategyInstance) OptNilRolloutStrategyInstanceArray {
+	return OptNilRolloutStrategyInstanceArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilRolloutStrategyInstanceArray is optional nullable []RolloutStrategyInstance.
+type OptNilRolloutStrategyInstanceArray struct {
+	Value []RolloutStrategyInstance
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilRolloutStrategyInstanceArray was set.
+func (o OptNilRolloutStrategyInstanceArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilRolloutStrategyInstanceArray) Reset() {
+	var v []RolloutStrategyInstance
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilRolloutStrategyInstanceArray) SetTo(v []RolloutStrategyInstance) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilRolloutStrategyInstanceArray) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilRolloutStrategyInstanceArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []RolloutStrategyInstance
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilRolloutStrategyInstanceArray) Get() (v []RolloutStrategyInstance, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilRolloutStrategyInstanceArray) Or(d []RolloutStrategyInstance) []RolloutStrategyInstance {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilSearchFeatureFilterApplicationArray returns new OptNilSearchFeatureFilterApplicationArray with value set to v.
+func NewOptNilSearchFeatureFilterApplicationArray(v []SearchFeatureFilterApplication) OptNilSearchFeatureFilterApplicationArray {
+	return OptNilSearchFeatureFilterApplicationArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilSearchFeatureFilterApplicationArray is optional nullable []SearchFeatureFilterApplication.
+type OptNilSearchFeatureFilterApplicationArray struct {
+	Value []SearchFeatureFilterApplication
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilSearchFeatureFilterApplicationArray was set.
+func (o OptNilSearchFeatureFilterApplicationArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilSearchFeatureFilterApplicationArray) Reset() {
+	var v []SearchFeatureFilterApplication
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilSearchFeatureFilterApplicationArray) SetTo(v []SearchFeatureFilterApplication) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilSearchFeatureFilterApplicationArray) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilSearchFeatureFilterApplicationArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []SearchFeatureFilterApplication
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilSearchFeatureFilterApplicationArray) Get() (v []SearchFeatureFilterApplication, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilSearchFeatureFilterApplicationArray) Or(d []SearchFeatureFilterApplication) []SearchFeatureFilterApplication {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilSearchFeatureFilterFeatureArray returns new OptNilSearchFeatureFilterFeatureArray with value set to v.
+func NewOptNilSearchFeatureFilterFeatureArray(v []SearchFeatureFilterFeature) OptNilSearchFeatureFilterFeatureArray {
+	return OptNilSearchFeatureFilterFeatureArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilSearchFeatureFilterFeatureArray is optional nullable []SearchFeatureFilterFeature.
+type OptNilSearchFeatureFilterFeatureArray struct {
+	Value []SearchFeatureFilterFeature
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilSearchFeatureFilterFeatureArray was set.
+func (o OptNilSearchFeatureFilterFeatureArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilSearchFeatureFilterFeatureArray) Reset() {
+	var v []SearchFeatureFilterFeature
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilSearchFeatureFilterFeatureArray) SetTo(v []SearchFeatureFilterFeature) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilSearchFeatureFilterFeatureArray) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilSearchFeatureFilterFeatureArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []SearchFeatureFilterFeature
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilSearchFeatureFilterFeatureArray) Get() (v []SearchFeatureFilterFeature, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilSearchFeatureFilterFeatureArray) Or(d []SearchFeatureFilterFeature) []SearchFeatureFilterFeature {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilSearchFeatureFilterServiceAccountArray returns new OptNilSearchFeatureFilterServiceAccountArray with value set to v.
+func NewOptNilSearchFeatureFilterServiceAccountArray(v []SearchFeatureFilterServiceAccount) OptNilSearchFeatureFilterServiceAccountArray {
+	return OptNilSearchFeatureFilterServiceAccountArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilSearchFeatureFilterServiceAccountArray is optional nullable []SearchFeatureFilterServiceAccount.
+type OptNilSearchFeatureFilterServiceAccountArray struct {
+	Value []SearchFeatureFilterServiceAccount
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilSearchFeatureFilterServiceAccountArray was set.
+func (o OptNilSearchFeatureFilterServiceAccountArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilSearchFeatureFilterServiceAccountArray) Reset() {
+	var v []SearchFeatureFilterServiceAccount
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilSearchFeatureFilterServiceAccountArray) SetTo(v []SearchFeatureFilterServiceAccount) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilSearchFeatureFilterServiceAccountArray) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilSearchFeatureFilterServiceAccountArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []SearchFeatureFilterServiceAccount
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilSearchFeatureFilterServiceAccountArray) Get() (v []SearchFeatureFilterServiceAccount, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilSearchFeatureFilterServiceAccountArray) Or(d []SearchFeatureFilterServiceAccount) []SearchFeatureFilterServiceAccount {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilServiceAccount returns new OptNilServiceAccount with value set to v.
+func NewOptNilServiceAccount(v ServiceAccount) OptNilServiceAccount {
+	return OptNilServiceAccount{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilServiceAccount is optional nullable ServiceAccount.
+type OptNilServiceAccount struct {
+	Value ServiceAccount
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilServiceAccount was set.
+func (o OptNilServiceAccount) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilServiceAccount) Reset() {
+	var v ServiceAccount
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilServiceAccount) SetTo(v ServiceAccount) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilServiceAccount) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilServiceAccount) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v ServiceAccount
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilServiceAccount) Get() (v ServiceAccount, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilServiceAccount) Or(d ServiceAccount) ServiceAccount {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilServiceAccountPermissionArray returns new OptNilServiceAccountPermissionArray with value set to v.
 func NewOptNilServiceAccountPermissionArray(v []ServiceAccountPermission) OptNilServiceAccountPermissionArray {
 	return OptNilServiceAccountPermissionArray{
@@ -5358,6 +7012,69 @@ func (o OptNilServiceAccountPermissionArray) Get() (v []ServiceAccountPermission
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilServiceAccountPermissionArray) Or(d []ServiceAccountPermission) []ServiceAccountPermission {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilSortOrder returns new OptNilSortOrder with value set to v.
+func NewOptNilSortOrder(v SortOrder) OptNilSortOrder {
+	return OptNilSortOrder{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilSortOrder is optional nullable SortOrder.
+type OptNilSortOrder struct {
+	Value SortOrder
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilSortOrder was set.
+func (o OptNilSortOrder) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilSortOrder) Reset() {
+	var v SortOrder
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilSortOrder) SetTo(v SortOrder) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilSortOrder) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilSortOrder) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v SortOrder
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilSortOrder) Get() (v SortOrder, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilSortOrder) Or(d SortOrder) SortOrder {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -5490,6 +7207,69 @@ func (o OptNilStringArray) Or(d []string) []string {
 	return d
 }
 
+// NewOptNilThinGroupRolloutStrategyArray returns new OptNilThinGroupRolloutStrategyArray with value set to v.
+func NewOptNilThinGroupRolloutStrategyArray(v []ThinGroupRolloutStrategy) OptNilThinGroupRolloutStrategyArray {
+	return OptNilThinGroupRolloutStrategyArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilThinGroupRolloutStrategyArray is optional nullable []ThinGroupRolloutStrategy.
+type OptNilThinGroupRolloutStrategyArray struct {
+	Value []ThinGroupRolloutStrategy
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilThinGroupRolloutStrategyArray was set.
+func (o OptNilThinGroupRolloutStrategyArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilThinGroupRolloutStrategyArray) Reset() {
+	var v []ThinGroupRolloutStrategy
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilThinGroupRolloutStrategyArray) SetTo(v []ThinGroupRolloutStrategy) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilThinGroupRolloutStrategyArray) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilThinGroupRolloutStrategyArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []ThinGroupRolloutStrategy
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilThinGroupRolloutStrategyArray) Get() (v []ThinGroupRolloutStrategy, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilThinGroupRolloutStrategyArray) Or(d []ThinGroupRolloutStrategy) []ThinGroupRolloutStrategy {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilTrackEventResponseArray returns new OptNilTrackEventResponseArray with value set to v.
 func NewOptNilTrackEventResponseArray(v []TrackEventResponse) OptNilTrackEventResponseArray {
 	return OptNilTrackEventResponseArray{
@@ -5547,69 +7327,6 @@ func (o OptNilTrackEventResponseArray) Get() (v []TrackEventResponse, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilTrackEventResponseArray) Or(d []TrackEventResponse) []TrackEventResponse {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilTrackEventResponseHeaders returns new OptNilTrackEventResponseHeaders with value set to v.
-func NewOptNilTrackEventResponseHeaders(v TrackEventResponseHeaders) OptNilTrackEventResponseHeaders {
-	return OptNilTrackEventResponseHeaders{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilTrackEventResponseHeaders is optional nullable TrackEventResponseHeaders.
-type OptNilTrackEventResponseHeaders struct {
-	Value TrackEventResponseHeaders
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilTrackEventResponseHeaders was set.
-func (o OptNilTrackEventResponseHeaders) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilTrackEventResponseHeaders) Reset() {
-	var v TrackEventResponseHeaders
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilTrackEventResponseHeaders) SetTo(v TrackEventResponseHeaders) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilTrackEventResponseHeaders) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilTrackEventResponseHeaders) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v TrackEventResponseHeaders
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilTrackEventResponseHeaders) Get() (v TrackEventResponseHeaders, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilTrackEventResponseHeaders) Or(d TrackEventResponseHeaders) TrackEventResponseHeaders {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -5742,55 +7459,38 @@ func (o OptNilUUIDArray) Or(d []uuid.UUID) []uuid.UUID {
 	return d
 }
 
-// NewOptNilUpdateEnvironmentEnvironmentInfo returns new OptNilUpdateEnvironmentEnvironmentInfo with value set to v.
-func NewOptNilUpdateEnvironmentEnvironmentInfo(v UpdateEnvironmentEnvironmentInfo) OptNilUpdateEnvironmentEnvironmentInfo {
-	return OptNilUpdateEnvironmentEnvironmentInfo{
+// NewOptPaginationResult returns new OptPaginationResult with value set to v.
+func NewOptPaginationResult(v PaginationResult) OptPaginationResult {
+	return OptPaginationResult{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptNilUpdateEnvironmentEnvironmentInfo is optional nullable UpdateEnvironmentEnvironmentInfo.
-type OptNilUpdateEnvironmentEnvironmentInfo struct {
-	Value UpdateEnvironmentEnvironmentInfo
+// OptPaginationResult is optional PaginationResult.
+type OptPaginationResult struct {
+	Value PaginationResult
 	Set   bool
-	Null  bool
 }
 
-// IsSet returns true if OptNilUpdateEnvironmentEnvironmentInfo was set.
-func (o OptNilUpdateEnvironmentEnvironmentInfo) IsSet() bool { return o.Set }
+// IsSet returns true if OptPaginationResult was set.
+func (o OptPaginationResult) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptNilUpdateEnvironmentEnvironmentInfo) Reset() {
-	var v UpdateEnvironmentEnvironmentInfo
+func (o *OptPaginationResult) Reset() {
+	var v PaginationResult
 	o.Value = v
 	o.Set = false
-	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptNilUpdateEnvironmentEnvironmentInfo) SetTo(v UpdateEnvironmentEnvironmentInfo) {
+func (o *OptPaginationResult) SetTo(v PaginationResult) {
 	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilUpdateEnvironmentEnvironmentInfo) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilUpdateEnvironmentEnvironmentInfo) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v UpdateEnvironmentEnvironmentInfo
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptNilUpdateEnvironmentEnvironmentInfo) Get() (v UpdateEnvironmentEnvironmentInfo, ok bool) {
-	if o.Null {
-		return v, false
-	}
+func (o OptPaginationResult) Get() (v PaginationResult, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -5798,322 +7498,7 @@ func (o OptNilUpdateEnvironmentEnvironmentInfo) Get() (v UpdateEnvironmentEnviro
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptNilUpdateEnvironmentEnvironmentInfo) Or(d UpdateEnvironmentEnvironmentInfo) UpdateEnvironmentEnvironmentInfo {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilUpdateEnvironmentV2EnvironmentInfo returns new OptNilUpdateEnvironmentV2EnvironmentInfo with value set to v.
-func NewOptNilUpdateEnvironmentV2EnvironmentInfo(v UpdateEnvironmentV2EnvironmentInfo) OptNilUpdateEnvironmentV2EnvironmentInfo {
-	return OptNilUpdateEnvironmentV2EnvironmentInfo{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilUpdateEnvironmentV2EnvironmentInfo is optional nullable UpdateEnvironmentV2EnvironmentInfo.
-type OptNilUpdateEnvironmentV2EnvironmentInfo struct {
-	Value UpdateEnvironmentV2EnvironmentInfo
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilUpdateEnvironmentV2EnvironmentInfo was set.
-func (o OptNilUpdateEnvironmentV2EnvironmentInfo) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilUpdateEnvironmentV2EnvironmentInfo) Reset() {
-	var v UpdateEnvironmentV2EnvironmentInfo
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilUpdateEnvironmentV2EnvironmentInfo) SetTo(v UpdateEnvironmentV2EnvironmentInfo) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilUpdateEnvironmentV2EnvironmentInfo) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilUpdateEnvironmentV2EnvironmentInfo) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v UpdateEnvironmentV2EnvironmentInfo
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilUpdateEnvironmentV2EnvironmentInfo) Get() (v UpdateEnvironmentV2EnvironmentInfo, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilUpdateEnvironmentV2EnvironmentInfo) Or(d UpdateEnvironmentV2EnvironmentInfo) UpdateEnvironmentV2EnvironmentInfo {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilUpdateEnvironmentV2WebhookEnvironmentInfo returns new OptNilUpdateEnvironmentV2WebhookEnvironmentInfo with value set to v.
-func NewOptNilUpdateEnvironmentV2WebhookEnvironmentInfo(v UpdateEnvironmentV2WebhookEnvironmentInfo) OptNilUpdateEnvironmentV2WebhookEnvironmentInfo {
-	return OptNilUpdateEnvironmentV2WebhookEnvironmentInfo{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilUpdateEnvironmentV2WebhookEnvironmentInfo is optional nullable UpdateEnvironmentV2WebhookEnvironmentInfo.
-type OptNilUpdateEnvironmentV2WebhookEnvironmentInfo struct {
-	Value UpdateEnvironmentV2WebhookEnvironmentInfo
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilUpdateEnvironmentV2WebhookEnvironmentInfo was set.
-func (o OptNilUpdateEnvironmentV2WebhookEnvironmentInfo) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilUpdateEnvironmentV2WebhookEnvironmentInfo) Reset() {
-	var v UpdateEnvironmentV2WebhookEnvironmentInfo
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilUpdateEnvironmentV2WebhookEnvironmentInfo) SetTo(v UpdateEnvironmentV2WebhookEnvironmentInfo) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilUpdateEnvironmentV2WebhookEnvironmentInfo) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilUpdateEnvironmentV2WebhookEnvironmentInfo) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v UpdateEnvironmentV2WebhookEnvironmentInfo
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilUpdateEnvironmentV2WebhookEnvironmentInfo) Get() (v UpdateEnvironmentV2WebhookEnvironmentInfo, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilUpdateEnvironmentV2WebhookEnvironmentInfo) Or(d UpdateEnvironmentV2WebhookEnvironmentInfo) UpdateEnvironmentV2WebhookEnvironmentInfo {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilUpdateEnvironmentWebhookEnvironmentInfo returns new OptNilUpdateEnvironmentWebhookEnvironmentInfo with value set to v.
-func NewOptNilUpdateEnvironmentWebhookEnvironmentInfo(v UpdateEnvironmentWebhookEnvironmentInfo) OptNilUpdateEnvironmentWebhookEnvironmentInfo {
-	return OptNilUpdateEnvironmentWebhookEnvironmentInfo{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilUpdateEnvironmentWebhookEnvironmentInfo is optional nullable UpdateEnvironmentWebhookEnvironmentInfo.
-type OptNilUpdateEnvironmentWebhookEnvironmentInfo struct {
-	Value UpdateEnvironmentWebhookEnvironmentInfo
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilUpdateEnvironmentWebhookEnvironmentInfo was set.
-func (o OptNilUpdateEnvironmentWebhookEnvironmentInfo) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilUpdateEnvironmentWebhookEnvironmentInfo) Reset() {
-	var v UpdateEnvironmentWebhookEnvironmentInfo
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilUpdateEnvironmentWebhookEnvironmentInfo) SetTo(v UpdateEnvironmentWebhookEnvironmentInfo) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilUpdateEnvironmentWebhookEnvironmentInfo) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilUpdateEnvironmentWebhookEnvironmentInfo) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v UpdateEnvironmentWebhookEnvironmentInfo
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilUpdateEnvironmentWebhookEnvironmentInfo) Get() (v UpdateEnvironmentWebhookEnvironmentInfo, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilUpdateEnvironmentWebhookEnvironmentInfo) Or(d UpdateEnvironmentWebhookEnvironmentInfo) UpdateEnvironmentWebhookEnvironmentInfo {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilWebhookDetailIncomingHeaders returns new OptNilWebhookDetailIncomingHeaders with value set to v.
-func NewOptNilWebhookDetailIncomingHeaders(v WebhookDetailIncomingHeaders) OptNilWebhookDetailIncomingHeaders {
-	return OptNilWebhookDetailIncomingHeaders{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilWebhookDetailIncomingHeaders is optional nullable WebhookDetailIncomingHeaders.
-type OptNilWebhookDetailIncomingHeaders struct {
-	Value WebhookDetailIncomingHeaders
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilWebhookDetailIncomingHeaders was set.
-func (o OptNilWebhookDetailIncomingHeaders) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilWebhookDetailIncomingHeaders) Reset() {
-	var v WebhookDetailIncomingHeaders
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilWebhookDetailIncomingHeaders) SetTo(v WebhookDetailIncomingHeaders) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilWebhookDetailIncomingHeaders) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilWebhookDetailIncomingHeaders) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v WebhookDetailIncomingHeaders
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilWebhookDetailIncomingHeaders) Get() (v WebhookDetailIncomingHeaders, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilWebhookDetailIncomingHeaders) Or(d WebhookDetailIncomingHeaders) WebhookDetailIncomingHeaders {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilWebhookDetailOutboundHeaders returns new OptNilWebhookDetailOutboundHeaders with value set to v.
-func NewOptNilWebhookDetailOutboundHeaders(v WebhookDetailOutboundHeaders) OptNilWebhookDetailOutboundHeaders {
-	return OptNilWebhookDetailOutboundHeaders{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilWebhookDetailOutboundHeaders is optional nullable WebhookDetailOutboundHeaders.
-type OptNilWebhookDetailOutboundHeaders struct {
-	Value WebhookDetailOutboundHeaders
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilWebhookDetailOutboundHeaders was set.
-func (o OptNilWebhookDetailOutboundHeaders) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilWebhookDetailOutboundHeaders) Reset() {
-	var v WebhookDetailOutboundHeaders
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilWebhookDetailOutboundHeaders) SetTo(v WebhookDetailOutboundHeaders) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilWebhookDetailOutboundHeaders) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilWebhookDetailOutboundHeaders) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v WebhookDetailOutboundHeaders
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilWebhookDetailOutboundHeaders) Get() (v WebhookDetailOutboundHeaders, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilWebhookDetailOutboundHeaders) Or(d WebhookDetailOutboundHeaders) WebhookDetailOutboundHeaders {
+func (o OptPaginationResult) Or(d PaginationResult) PaginationResult {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -6212,6 +7597,52 @@ func (o OptRolloutStrategy) Or(d RolloutStrategy) RolloutStrategy {
 	return d
 }
 
+// NewOptRolloutStrategyInstance returns new OptRolloutStrategyInstance with value set to v.
+func NewOptRolloutStrategyInstance(v RolloutStrategyInstance) OptRolloutStrategyInstance {
+	return OptRolloutStrategyInstance{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptRolloutStrategyInstance is optional RolloutStrategyInstance.
+type OptRolloutStrategyInstance struct {
+	Value RolloutStrategyInstance
+	Set   bool
+}
+
+// IsSet returns true if OptRolloutStrategyInstance was set.
+func (o OptRolloutStrategyInstance) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptRolloutStrategyInstance) Reset() {
+	var v RolloutStrategyInstance
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptRolloutStrategyInstance) SetTo(v RolloutStrategyInstance) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptRolloutStrategyInstance) Get() (v RolloutStrategyInstance, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptRolloutStrategyInstance) Or(d RolloutStrategyInstance) RolloutStrategyInstance {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptSearchPersonSortBy returns new OptSearchPersonSortBy with value set to v.
 func NewOptSearchPersonSortBy(v SearchPersonSortBy) OptSearchPersonSortBy {
 	return OptSearchPersonSortBy{
@@ -6258,52 +7689,6 @@ func (o OptSearchPersonSortBy) Or(d SearchPersonSortBy) SearchPersonSortBy {
 	return d
 }
 
-// NewOptSetupMissingResponseCapabilityInfo returns new OptSetupMissingResponseCapabilityInfo with value set to v.
-func NewOptSetupMissingResponseCapabilityInfo(v SetupMissingResponseCapabilityInfo) OptSetupMissingResponseCapabilityInfo {
-	return OptSetupMissingResponseCapabilityInfo{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptSetupMissingResponseCapabilityInfo is optional SetupMissingResponseCapabilityInfo.
-type OptSetupMissingResponseCapabilityInfo struct {
-	Value SetupMissingResponseCapabilityInfo
-	Set   bool
-}
-
-// IsSet returns true if OptSetupMissingResponseCapabilityInfo was set.
-func (o OptSetupMissingResponseCapabilityInfo) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptSetupMissingResponseCapabilityInfo) Reset() {
-	var v SetupMissingResponseCapabilityInfo
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptSetupMissingResponseCapabilityInfo) SetTo(v SetupMissingResponseCapabilityInfo) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptSetupMissingResponseCapabilityInfo) Get() (v SetupMissingResponseCapabilityInfo, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptSetupMissingResponseCapabilityInfo) Or(d SetupMissingResponseCapabilityInfo) SetupMissingResponseCapabilityInfo {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptSetupMissingResponseProviderInfo returns new OptSetupMissingResponseProviderInfo with value set to v.
 func NewOptSetupMissingResponseProviderInfo(v SetupMissingResponseProviderInfo) OptSetupMissingResponseProviderInfo {
 	return OptSetupMissingResponseProviderInfo{
@@ -6344,52 +7729,6 @@ func (o OptSetupMissingResponseProviderInfo) Get() (v SetupMissingResponseProvid
 
 // Or returns value if set, or given parameter if does not.
 func (o OptSetupMissingResponseProviderInfo) Or(d SetupMissingResponseProviderInfo) SetupMissingResponseProviderInfo {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptSortOrder returns new OptSortOrder with value set to v.
-func NewOptSortOrder(v SortOrder) OptSortOrder {
-	return OptSortOrder{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptSortOrder is optional SortOrder.
-type OptSortOrder struct {
-	Value SortOrder
-	Set   bool
-}
-
-// IsSet returns true if OptSortOrder was set.
-func (o OptSortOrder) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptSortOrder) Reset() {
-	var v SortOrder
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptSortOrder) SetTo(v SortOrder) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptSortOrder) Get() (v SortOrder, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptSortOrder) Or(d SortOrder) SortOrder {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -6629,13 +7968,138 @@ func (s *Organization) SetWhenArchived(val OptNilDateTime) {
 	s.WhenArchived = val
 }
 
-type PasswordReset jx.Raw
+// Ref: #/components/schemas/OutstandingRegistration
+type OutstandingRegistration struct {
+	ID      uuid.UUID `json:"id"`
+	Token   string    `json:"token"`
+	Expired bool      `json:"expired"`
+}
 
-type PasswordUpdate jx.Raw
+// GetID returns the value of ID.
+func (s *OutstandingRegistration) GetID() uuid.UUID {
+	return s.ID
+}
+
+// GetToken returns the value of Token.
+func (s *OutstandingRegistration) GetToken() string {
+	return s.Token
+}
+
+// GetExpired returns the value of Expired.
+func (s *OutstandingRegistration) GetExpired() bool {
+	return s.Expired
+}
+
+// SetID sets the value of ID.
+func (s *OutstandingRegistration) SetID(val uuid.UUID) {
+	s.ID = val
+}
+
+// SetToken sets the value of Token.
+func (s *OutstandingRegistration) SetToken(val string) {
+	s.Token = val
+}
+
+// SetExpired sets the value of Expired.
+func (s *OutstandingRegistration) SetExpired(val bool) {
+	s.Expired = val
+}
+
+// Ref: #/components/schemas/PaginationResult
+type PaginationResult struct {
+	// What is the total number of records.
+	Total int `json:"total"`
+	// What page are we on.
+	Page int `json:"page"`
+	// What was the page size chosen (if not passed).
+	PageSize int `json:"pageSize"`
+}
+
+// GetTotal returns the value of Total.
+func (s *PaginationResult) GetTotal() int {
+	return s.Total
+}
+
+// GetPage returns the value of Page.
+func (s *PaginationResult) GetPage() int {
+	return s.Page
+}
+
+// GetPageSize returns the value of PageSize.
+func (s *PaginationResult) GetPageSize() int {
+	return s.PageSize
+}
+
+// SetTotal sets the value of Total.
+func (s *PaginationResult) SetTotal(val int) {
+	s.Total = val
+}
+
+// SetPage sets the value of Page.
+func (s *PaginationResult) SetPage(val int) {
+	s.Page = val
+}
+
+// SetPageSize sets the value of PageSize.
+func (s *PaginationResult) SetPageSize(val int) {
+	s.PageSize = val
+}
+
+// Ref: #/components/schemas/PasswordReset
+type PasswordReset struct {
+	Password   string  `json:"password"`
+	Reactivate OptBool `json:"reactivate"`
+}
+
+// GetPassword returns the value of Password.
+func (s *PasswordReset) GetPassword() string {
+	return s.Password
+}
+
+// GetReactivate returns the value of Reactivate.
+func (s *PasswordReset) GetReactivate() OptBool {
+	return s.Reactivate
+}
+
+// SetPassword sets the value of Password.
+func (s *PasswordReset) SetPassword(val string) {
+	s.Password = val
+}
+
+// SetReactivate sets the value of Reactivate.
+func (s *PasswordReset) SetReactivate(val OptBool) {
+	s.Reactivate = val
+}
+
+// Ref: #/components/schemas/PasswordUpdate
+type PasswordUpdate struct {
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
+}
+
+// GetOldPassword returns the value of OldPassword.
+func (s *PasswordUpdate) GetOldPassword() string {
+	return s.OldPassword
+}
+
+// GetNewPassword returns the value of NewPassword.
+func (s *PasswordUpdate) GetNewPassword() string {
+	return s.NewPassword
+}
+
+// SetOldPassword sets the value of OldPassword.
+func (s *PasswordUpdate) SetOldPassword(val string) {
+	s.OldPassword = val
+}
+
+// SetNewPassword sets the value of NewPassword.
+func (s *PasswordUpdate) SetNewPassword(val string) {
+	s.NewPassword = val
+}
 
 // Ref: #/components/schemas/Person
 type Person struct {
-	ID                    PersonId         `json:"id"`
+	ID                    OptNilPersonId   `json:"id"`
 	Name                  OptNilString     `json:"name"`
 	Email                 OptNilString     `json:"email"`
 	PersonType            OptNilPersonType `json:"personType"`
@@ -6654,7 +8118,7 @@ type Person struct {
 }
 
 // GetID returns the value of ID.
-func (s *Person) GetID() PersonId {
+func (s *Person) GetID() OptNilPersonId {
 	return s.ID
 }
 
@@ -6719,7 +8183,7 @@ func (s *Person) GetAdditional() OptNilPersonInfoArray {
 }
 
 // SetID sets the value of ID.
-func (s *Person) SetID(val PersonId) {
+func (s *Person) SetID(val OptNilPersonId) {
 	s.ID = val
 }
 
@@ -6804,7 +8268,20 @@ type PersonByTokenUnauthorized struct{}
 
 func (*PersonByTokenUnauthorized) personByTokenRes() {}
 
-type PersonId jx.Raw
+// Ref: #/components/schemas/PersonId
+type PersonId struct {
+	ID uuid.UUID `json:"id"`
+}
+
+// GetID returns the value of ID.
+func (s *PersonId) GetID() uuid.UUID {
+	return s.ID
+}
+
+// SetID sets the value of ID.
+func (s *PersonId) SetID(val uuid.UUID) {
+	s.ID = val
+}
 
 // Ref: #/components/schemas/PersonInfo
 type PersonInfo struct {
@@ -6833,7 +8310,64 @@ func (s *PersonInfo) SetValue(val string) {
 	s.Value = val
 }
 
-type PersonRegistrationDetails jx.Raw
+// Ref: #/components/schemas/PersonRegistrationDetails
+type PersonRegistrationDetails struct {
+	Name              string `json:"name"`
+	Email             string `json:"email"`
+	Password          string `json:"password"`
+	ConfirmPassword   string `json:"confirmPassword"`
+	RegistrationToken string `json:"registrationToken"`
+}
+
+// GetName returns the value of Name.
+func (s *PersonRegistrationDetails) GetName() string {
+	return s.Name
+}
+
+// GetEmail returns the value of Email.
+func (s *PersonRegistrationDetails) GetEmail() string {
+	return s.Email
+}
+
+// GetPassword returns the value of Password.
+func (s *PersonRegistrationDetails) GetPassword() string {
+	return s.Password
+}
+
+// GetConfirmPassword returns the value of ConfirmPassword.
+func (s *PersonRegistrationDetails) GetConfirmPassword() string {
+	return s.ConfirmPassword
+}
+
+// GetRegistrationToken returns the value of RegistrationToken.
+func (s *PersonRegistrationDetails) GetRegistrationToken() string {
+	return s.RegistrationToken
+}
+
+// SetName sets the value of Name.
+func (s *PersonRegistrationDetails) SetName(val string) {
+	s.Name = val
+}
+
+// SetEmail sets the value of Email.
+func (s *PersonRegistrationDetails) SetEmail(val string) {
+	s.Email = val
+}
+
+// SetPassword sets the value of Password.
+func (s *PersonRegistrationDetails) SetPassword(val string) {
+	s.Password = val
+}
+
+// SetConfirmPassword sets the value of ConfirmPassword.
+func (s *PersonRegistrationDetails) SetConfirmPassword(val string) {
+	s.ConfirmPassword = val
+}
+
+// SetRegistrationToken sets the value of RegistrationToken.
+func (s *PersonRegistrationDetails) SetRegistrationToken(val string) {
+	s.RegistrationToken = val
+}
 
 // Ref: #/components/schemas/PersonType
 type PersonType string
@@ -7058,7 +8592,42 @@ type RegisterPersonUnauthorized struct{}
 
 func (*RegisterPersonUnauthorized) registerPersonRes() {}
 
-type RegistrationUrl jx.Raw
+// Ref: #/components/schemas/RegistrationUrl
+type RegistrationUrl struct {
+	RegistrationUrl OptNilString `json:"registrationUrl"`
+	PersonId        uuid.UUID    `json:"personId"`
+	Token           string       `json:"token"`
+}
+
+// GetRegistrationUrl returns the value of RegistrationUrl.
+func (s *RegistrationUrl) GetRegistrationUrl() OptNilString {
+	return s.RegistrationUrl
+}
+
+// GetPersonId returns the value of PersonId.
+func (s *RegistrationUrl) GetPersonId() uuid.UUID {
+	return s.PersonId
+}
+
+// GetToken returns the value of Token.
+func (s *RegistrationUrl) GetToken() string {
+	return s.Token
+}
+
+// SetRegistrationUrl sets the value of RegistrationUrl.
+func (s *RegistrationUrl) SetRegistrationUrl(val OptNilString) {
+	s.RegistrationUrl = val
+}
+
+// SetPersonId sets the value of PersonId.
+func (s *RegistrationUrl) SetPersonId(val uuid.UUID) {
+	s.PersonId = val
+}
+
+// SetToken sets the value of Token.
+func (s *RegistrationUrl) SetToken(val string) {
+	s.Token = val
+}
 
 func (*RegistrationUrl) createPersonRes()      {}
 func (*RegistrationUrl) resetExpiredTokenRes() {}
@@ -7367,7 +8936,173 @@ func (s *RolloutStrategy) SetID(val OptNilString) {
 	s.ID = val
 }
 
-type RolloutStrategyAttribute jx.Raw
+type RolloutStrategyArrayType jx.Raw
+
+// Ref: #/components/schemas/RolloutStrategyAttribute
+type RolloutStrategyAttribute struct {
+	// An ID that needs to exist for validation.
+	ID          OptNilString                        `json:"id"`
+	Conditional RolloutStrategyAttributeConditional `json:"conditional"`
+	FieldName   string                              `json:"fieldName"`
+	// The value(s) associated with this rule.
+	Values []RolloutStrategyArrayType `json:"values"`
+	Type   RolloutStrategyFieldType   `json:"type"`
+}
+
+// GetID returns the value of ID.
+func (s *RolloutStrategyAttribute) GetID() OptNilString {
+	return s.ID
+}
+
+// GetConditional returns the value of Conditional.
+func (s *RolloutStrategyAttribute) GetConditional() RolloutStrategyAttributeConditional {
+	return s.Conditional
+}
+
+// GetFieldName returns the value of FieldName.
+func (s *RolloutStrategyAttribute) GetFieldName() string {
+	return s.FieldName
+}
+
+// GetValues returns the value of Values.
+func (s *RolloutStrategyAttribute) GetValues() []RolloutStrategyArrayType {
+	return s.Values
+}
+
+// GetType returns the value of Type.
+func (s *RolloutStrategyAttribute) GetType() RolloutStrategyFieldType {
+	return s.Type
+}
+
+// SetID sets the value of ID.
+func (s *RolloutStrategyAttribute) SetID(val OptNilString) {
+	s.ID = val
+}
+
+// SetConditional sets the value of Conditional.
+func (s *RolloutStrategyAttribute) SetConditional(val RolloutStrategyAttributeConditional) {
+	s.Conditional = val
+}
+
+// SetFieldName sets the value of FieldName.
+func (s *RolloutStrategyAttribute) SetFieldName(val string) {
+	s.FieldName = val
+}
+
+// SetValues sets the value of Values.
+func (s *RolloutStrategyAttribute) SetValues(val []RolloutStrategyArrayType) {
+	s.Values = val
+}
+
+// SetType sets the value of Type.
+func (s *RolloutStrategyAttribute) SetType(val RolloutStrategyFieldType) {
+	s.Type = val
+}
+
+// Ref: #/components/schemas/RolloutStrategyAttributeConditional
+type RolloutStrategyAttributeConditional string
+
+const (
+	RolloutStrategyAttributeConditionalEQUALS        RolloutStrategyAttributeConditional = "EQUALS"
+	RolloutStrategyAttributeConditionalENDSWITH      RolloutStrategyAttributeConditional = "ENDS_WITH"
+	RolloutStrategyAttributeConditionalSTARTSWITH    RolloutStrategyAttributeConditional = "STARTS_WITH"
+	RolloutStrategyAttributeConditionalGREATER       RolloutStrategyAttributeConditional = "GREATER"
+	RolloutStrategyAttributeConditionalGREATEREQUALS RolloutStrategyAttributeConditional = "GREATER_EQUALS"
+	RolloutStrategyAttributeConditionalLESS          RolloutStrategyAttributeConditional = "LESS"
+	RolloutStrategyAttributeConditionalLESSEQUALS    RolloutStrategyAttributeConditional = "LESS_EQUALS"
+	RolloutStrategyAttributeConditionalNOTEQUALS     RolloutStrategyAttributeConditional = "NOT_EQUALS"
+	RolloutStrategyAttributeConditionalINCLUDES      RolloutStrategyAttributeConditional = "INCLUDES"
+	RolloutStrategyAttributeConditionalEXCLUDES      RolloutStrategyAttributeConditional = "EXCLUDES"
+	RolloutStrategyAttributeConditionalREGEX         RolloutStrategyAttributeConditional = "REGEX"
+)
+
+// AllValues returns all RolloutStrategyAttributeConditional values.
+func (RolloutStrategyAttributeConditional) AllValues() []RolloutStrategyAttributeConditional {
+	return []RolloutStrategyAttributeConditional{
+		RolloutStrategyAttributeConditionalEQUALS,
+		RolloutStrategyAttributeConditionalENDSWITH,
+		RolloutStrategyAttributeConditionalSTARTSWITH,
+		RolloutStrategyAttributeConditionalGREATER,
+		RolloutStrategyAttributeConditionalGREATEREQUALS,
+		RolloutStrategyAttributeConditionalLESS,
+		RolloutStrategyAttributeConditionalLESSEQUALS,
+		RolloutStrategyAttributeConditionalNOTEQUALS,
+		RolloutStrategyAttributeConditionalINCLUDES,
+		RolloutStrategyAttributeConditionalEXCLUDES,
+		RolloutStrategyAttributeConditionalREGEX,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s RolloutStrategyAttributeConditional) MarshalText() ([]byte, error) {
+	switch s {
+	case RolloutStrategyAttributeConditionalEQUALS:
+		return []byte(s), nil
+	case RolloutStrategyAttributeConditionalENDSWITH:
+		return []byte(s), nil
+	case RolloutStrategyAttributeConditionalSTARTSWITH:
+		return []byte(s), nil
+	case RolloutStrategyAttributeConditionalGREATER:
+		return []byte(s), nil
+	case RolloutStrategyAttributeConditionalGREATEREQUALS:
+		return []byte(s), nil
+	case RolloutStrategyAttributeConditionalLESS:
+		return []byte(s), nil
+	case RolloutStrategyAttributeConditionalLESSEQUALS:
+		return []byte(s), nil
+	case RolloutStrategyAttributeConditionalNOTEQUALS:
+		return []byte(s), nil
+	case RolloutStrategyAttributeConditionalINCLUDES:
+		return []byte(s), nil
+	case RolloutStrategyAttributeConditionalEXCLUDES:
+		return []byte(s), nil
+	case RolloutStrategyAttributeConditionalREGEX:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *RolloutStrategyAttributeConditional) UnmarshalText(data []byte) error {
+	switch RolloutStrategyAttributeConditional(data) {
+	case RolloutStrategyAttributeConditionalEQUALS:
+		*s = RolloutStrategyAttributeConditionalEQUALS
+		return nil
+	case RolloutStrategyAttributeConditionalENDSWITH:
+		*s = RolloutStrategyAttributeConditionalENDSWITH
+		return nil
+	case RolloutStrategyAttributeConditionalSTARTSWITH:
+		*s = RolloutStrategyAttributeConditionalSTARTSWITH
+		return nil
+	case RolloutStrategyAttributeConditionalGREATER:
+		*s = RolloutStrategyAttributeConditionalGREATER
+		return nil
+	case RolloutStrategyAttributeConditionalGREATEREQUALS:
+		*s = RolloutStrategyAttributeConditionalGREATEREQUALS
+		return nil
+	case RolloutStrategyAttributeConditionalLESS:
+		*s = RolloutStrategyAttributeConditionalLESS
+		return nil
+	case RolloutStrategyAttributeConditionalLESSEQUALS:
+		*s = RolloutStrategyAttributeConditionalLESSEQUALS
+		return nil
+	case RolloutStrategyAttributeConditionalNOTEQUALS:
+		*s = RolloutStrategyAttributeConditionalNOTEQUALS
+		return nil
+	case RolloutStrategyAttributeConditionalINCLUDES:
+		*s = RolloutStrategyAttributeConditionalINCLUDES
+		return nil
+	case RolloutStrategyAttributeConditionalEXCLUDES:
+		*s = RolloutStrategyAttributeConditionalEXCLUDES
+		return nil
+	case RolloutStrategyAttributeConditionalREGEX:
+		*s = RolloutStrategyAttributeConditionalREGEX
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 // Ref: #/components/schemas/RolloutStrategyCollectionViolationType
 type RolloutStrategyCollectionViolationType string
@@ -7411,7 +9146,133 @@ func (s *RolloutStrategyCollectionViolationType) UnmarshalText(data []byte) erro
 	}
 }
 
-type RolloutStrategyInstance jx.Raw
+// Ref: #/components/schemas/RolloutStrategyFieldType
+type RolloutStrategyFieldType string
+
+const (
+	RolloutStrategyFieldTypeSTRING          RolloutStrategyFieldType = "STRING"
+	RolloutStrategyFieldTypeSEMANTICVERSION RolloutStrategyFieldType = "SEMANTIC_VERSION"
+	RolloutStrategyFieldTypeNUMBER          RolloutStrategyFieldType = "NUMBER"
+	RolloutStrategyFieldTypeDATE            RolloutStrategyFieldType = "DATE"
+	RolloutStrategyFieldTypeDATETIME        RolloutStrategyFieldType = "DATETIME"
+	RolloutStrategyFieldTypeBOOLEAN         RolloutStrategyFieldType = "BOOLEAN"
+	RolloutStrategyFieldTypeIPADDRESS       RolloutStrategyFieldType = "IP_ADDRESS"
+)
+
+// AllValues returns all RolloutStrategyFieldType values.
+func (RolloutStrategyFieldType) AllValues() []RolloutStrategyFieldType {
+	return []RolloutStrategyFieldType{
+		RolloutStrategyFieldTypeSTRING,
+		RolloutStrategyFieldTypeSEMANTICVERSION,
+		RolloutStrategyFieldTypeNUMBER,
+		RolloutStrategyFieldTypeDATE,
+		RolloutStrategyFieldTypeDATETIME,
+		RolloutStrategyFieldTypeBOOLEAN,
+		RolloutStrategyFieldTypeIPADDRESS,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s RolloutStrategyFieldType) MarshalText() ([]byte, error) {
+	switch s {
+	case RolloutStrategyFieldTypeSTRING:
+		return []byte(s), nil
+	case RolloutStrategyFieldTypeSEMANTICVERSION:
+		return []byte(s), nil
+	case RolloutStrategyFieldTypeNUMBER:
+		return []byte(s), nil
+	case RolloutStrategyFieldTypeDATE:
+		return []byte(s), nil
+	case RolloutStrategyFieldTypeDATETIME:
+		return []byte(s), nil
+	case RolloutStrategyFieldTypeBOOLEAN:
+		return []byte(s), nil
+	case RolloutStrategyFieldTypeIPADDRESS:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *RolloutStrategyFieldType) UnmarshalText(data []byte) error {
+	switch RolloutStrategyFieldType(data) {
+	case RolloutStrategyFieldTypeSTRING:
+		*s = RolloutStrategyFieldTypeSTRING
+		return nil
+	case RolloutStrategyFieldTypeSEMANTICVERSION:
+		*s = RolloutStrategyFieldTypeSEMANTICVERSION
+		return nil
+	case RolloutStrategyFieldTypeNUMBER:
+		*s = RolloutStrategyFieldTypeNUMBER
+		return nil
+	case RolloutStrategyFieldTypeDATE:
+		*s = RolloutStrategyFieldTypeDATE
+		return nil
+	case RolloutStrategyFieldTypeDATETIME:
+		*s = RolloutStrategyFieldTypeDATETIME
+		return nil
+	case RolloutStrategyFieldTypeBOOLEAN:
+		*s = RolloutStrategyFieldTypeBOOLEAN
+		return nil
+	case RolloutStrategyFieldTypeIPADDRESS:
+		*s = RolloutStrategyFieldTypeIPADDRESS
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/RolloutStrategyInstance
+type RolloutStrategyInstance struct {
+	// This is copied from the shared rollout strategy on return, it is read only from the client
+	// perspective.
+	Name       OptNilString `json:"name"`
+	StrategyId OptUUID      `json:"strategyId"`
+	// The value for this rollout strategy for this feature value.
+	Value    jx.Raw     `json:"value"`
+	Disabled OptNilBool `json:"disabled"`
+}
+
+// GetName returns the value of Name.
+func (s *RolloutStrategyInstance) GetName() OptNilString {
+	return s.Name
+}
+
+// GetStrategyId returns the value of StrategyId.
+func (s *RolloutStrategyInstance) GetStrategyId() OptUUID {
+	return s.StrategyId
+}
+
+// GetValue returns the value of Value.
+func (s *RolloutStrategyInstance) GetValue() jx.Raw {
+	return s.Value
+}
+
+// GetDisabled returns the value of Disabled.
+func (s *RolloutStrategyInstance) GetDisabled() OptNilBool {
+	return s.Disabled
+}
+
+// SetName sets the value of Name.
+func (s *RolloutStrategyInstance) SetName(val OptNilString) {
+	s.Name = val
+}
+
+// SetStrategyId sets the value of StrategyId.
+func (s *RolloutStrategyInstance) SetStrategyId(val OptUUID) {
+	s.StrategyId = val
+}
+
+// SetValue sets the value of Value.
+func (s *RolloutStrategyInstance) SetValue(val jx.Raw) {
+	s.Value = val
+}
+
+// SetDisabled sets the value of Disabled.
+func (s *RolloutStrategyInstance) SetDisabled(val OptNilBool) {
+	s.Disabled = val
+}
 
 // A collection of strategies to validate together to see if it violates any rules.
 // Ref: #/components/schemas/RolloutStrategyValidationRequest
@@ -7677,7 +9538,369 @@ type SaveHiddenEnvironmentsUnprocessableEntity struct{}
 
 func (*SaveHiddenEnvironmentsUnprocessableEntity) saveHiddenEnvironmentsRes() {}
 
-type SearchPersonResult jx.Raw
+// An application which contains features. Features can be null or empty if the user has no
+// permission.
+// Ref: #/components/schemas/SearchFeatureFilterApplication
+type SearchFeatureFilterApplication struct {
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
+	// If the user has permission to this application, the features that match.
+	Features OptNilSearchFeatureFilterFeatureArray `json:"features"`
+}
+
+// GetID returns the value of ID.
+func (s *SearchFeatureFilterApplication) GetID() uuid.UUID {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *SearchFeatureFilterApplication) GetName() string {
+	return s.Name
+}
+
+// GetFeatures returns the value of Features.
+func (s *SearchFeatureFilterApplication) GetFeatures() OptNilSearchFeatureFilterFeatureArray {
+	return s.Features
+}
+
+// SetID sets the value of ID.
+func (s *SearchFeatureFilterApplication) SetID(val uuid.UUID) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *SearchFeatureFilterApplication) SetName(val string) {
+	s.Name = val
+}
+
+// SetFeatures sets the value of Features.
+func (s *SearchFeatureFilterApplication) SetFeatures(val OptNilSearchFeatureFilterFeatureArray) {
+	s.Features = val
+}
+
+// Details the feature key and which application it is that is using this feature filter.
+// Ref: #/components/schemas/SearchFeatureFilterFeature
+type SearchFeatureFilterFeature struct {
+	ID  uuid.UUID `json:"id"`
+	Key string    `json:"key"`
+}
+
+// GetID returns the value of ID.
+func (s *SearchFeatureFilterFeature) GetID() uuid.UUID {
+	return s.ID
+}
+
+// GetKey returns the value of Key.
+func (s *SearchFeatureFilterFeature) GetKey() string {
+	return s.Key
+}
+
+// SetID sets the value of ID.
+func (s *SearchFeatureFilterFeature) SetID(val uuid.UUID) {
+	s.ID = val
+}
+
+// SetKey sets the value of Key.
+func (s *SearchFeatureFilterFeature) SetKey(val string) {
+	s.Key = val
+}
+
+// Merged schema.
+// Ref: #/components/schemas/SearchFeatureFilterItem
+type SearchFeatureFilterItem struct {
+	ID uuid.UUID `json:"id"`
+	// Unique within this portfolio.
+	Name            string                                       `json:"name"`
+	Description     OptNilString                                 `json:"description"`
+	Version         int                                          `json:"version"`
+	WhoCreated      OptNilAnemicPerson                           `json:"whoCreated"`
+	ServiceAccounts OptNilSearchFeatureFilterServiceAccountArray `json:"serviceAccounts"`
+	// The applications, if any that have features that used this filter.
+	Applications OptNilSearchFeatureFilterApplicationArray `json:"applications"`
+}
+
+// GetID returns the value of ID.
+func (s *SearchFeatureFilterItem) GetID() uuid.UUID {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *SearchFeatureFilterItem) GetName() string {
+	return s.Name
+}
+
+// GetDescription returns the value of Description.
+func (s *SearchFeatureFilterItem) GetDescription() OptNilString {
+	return s.Description
+}
+
+// GetVersion returns the value of Version.
+func (s *SearchFeatureFilterItem) GetVersion() int {
+	return s.Version
+}
+
+// GetWhoCreated returns the value of WhoCreated.
+func (s *SearchFeatureFilterItem) GetWhoCreated() OptNilAnemicPerson {
+	return s.WhoCreated
+}
+
+// GetServiceAccounts returns the value of ServiceAccounts.
+func (s *SearchFeatureFilterItem) GetServiceAccounts() OptNilSearchFeatureFilterServiceAccountArray {
+	return s.ServiceAccounts
+}
+
+// GetApplications returns the value of Applications.
+func (s *SearchFeatureFilterItem) GetApplications() OptNilSearchFeatureFilterApplicationArray {
+	return s.Applications
+}
+
+// SetID sets the value of ID.
+func (s *SearchFeatureFilterItem) SetID(val uuid.UUID) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *SearchFeatureFilterItem) SetName(val string) {
+	s.Name = val
+}
+
+// SetDescription sets the value of Description.
+func (s *SearchFeatureFilterItem) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
+// SetVersion sets the value of Version.
+func (s *SearchFeatureFilterItem) SetVersion(val int) {
+	s.Version = val
+}
+
+// SetWhoCreated sets the value of WhoCreated.
+func (s *SearchFeatureFilterItem) SetWhoCreated(val OptNilAnemicPerson) {
+	s.WhoCreated = val
+}
+
+// SetServiceAccounts sets the value of ServiceAccounts.
+func (s *SearchFeatureFilterItem) SetServiceAccounts(val OptNilSearchFeatureFilterServiceAccountArray) {
+	s.ServiceAccounts = val
+}
+
+// SetApplications sets the value of Applications.
+func (s *SearchFeatureFilterItem) SetApplications(val OptNilSearchFeatureFilterApplicationArray) {
+	s.Applications = val
+}
+
+// The result of a search for feature filters.
+// Ref: #/components/schemas/SearchFeatureFilterResult
+type SearchFeatureFilterResult struct {
+	Pagination OptPaginationResult       `json:"pagination"`
+	Filters    []SearchFeatureFilterItem `json:"filters"`
+}
+
+// GetPagination returns the value of Pagination.
+func (s *SearchFeatureFilterResult) GetPagination() OptPaginationResult {
+	return s.Pagination
+}
+
+// GetFilters returns the value of Filters.
+func (s *SearchFeatureFilterResult) GetFilters() []SearchFeatureFilterItem {
+	return s.Filters
+}
+
+// SetPagination sets the value of Pagination.
+func (s *SearchFeatureFilterResult) SetPagination(val OptPaginationResult) {
+	s.Pagination = val
+}
+
+// SetFilters sets the value of Filters.
+func (s *SearchFeatureFilterResult) SetFilters(val []SearchFeatureFilterItem) {
+	s.Filters = val
+}
+
+func (*SearchFeatureFilterResult) findFeatureFiltersRes() {}
+
+// Details the service accounts that use this filter.
+// Ref: #/components/schemas/SearchFeatureFilterServiceAccount
+type SearchFeatureFilterServiceAccount struct {
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
+}
+
+// GetID returns the value of ID.
+func (s *SearchFeatureFilterServiceAccount) GetID() uuid.UUID {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *SearchFeatureFilterServiceAccount) GetName() string {
+	return s.Name
+}
+
+// SetID sets the value of ID.
+func (s *SearchFeatureFilterServiceAccount) SetID(val uuid.UUID) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *SearchFeatureFilterServiceAccount) SetName(val string) {
+	s.Name = val
+}
+
+// Ref: #/components/schemas/SearchPerson
+type SearchPerson struct {
+	ID         uuid.UUID  `json:"id"`
+	Name       string     `json:"name"`
+	Email      string     `json:"email"`
+	Version    int64      `json:"version"`
+	PersonType PersonType `json:"personType"`
+	// This is the timestamp in UTC when they last logged into the system.
+	WhenLastAuthenticated OptNilDateTime `json:"whenLastAuthenticated"`
+	// This is the timestamp in UTC when they last made a request to the system on their most recent
+	// login. If it is null it means they have no current token or have never logged in.
+	WhenLastSeen OptNilDateTime `json:"whenLastSeen"`
+	// When a person's account was deactivated (if it was) and when.
+	WhenDeactivated OptNilDateTime `json:"whenDeactivated"`
+	GroupCount      int            `json:"groupCount"`
+}
+
+// GetID returns the value of ID.
+func (s *SearchPerson) GetID() uuid.UUID {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *SearchPerson) GetName() string {
+	return s.Name
+}
+
+// GetEmail returns the value of Email.
+func (s *SearchPerson) GetEmail() string {
+	return s.Email
+}
+
+// GetVersion returns the value of Version.
+func (s *SearchPerson) GetVersion() int64 {
+	return s.Version
+}
+
+// GetPersonType returns the value of PersonType.
+func (s *SearchPerson) GetPersonType() PersonType {
+	return s.PersonType
+}
+
+// GetWhenLastAuthenticated returns the value of WhenLastAuthenticated.
+func (s *SearchPerson) GetWhenLastAuthenticated() OptNilDateTime {
+	return s.WhenLastAuthenticated
+}
+
+// GetWhenLastSeen returns the value of WhenLastSeen.
+func (s *SearchPerson) GetWhenLastSeen() OptNilDateTime {
+	return s.WhenLastSeen
+}
+
+// GetWhenDeactivated returns the value of WhenDeactivated.
+func (s *SearchPerson) GetWhenDeactivated() OptNilDateTime {
+	return s.WhenDeactivated
+}
+
+// GetGroupCount returns the value of GroupCount.
+func (s *SearchPerson) GetGroupCount() int {
+	return s.GroupCount
+}
+
+// SetID sets the value of ID.
+func (s *SearchPerson) SetID(val uuid.UUID) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *SearchPerson) SetName(val string) {
+	s.Name = val
+}
+
+// SetEmail sets the value of Email.
+func (s *SearchPerson) SetEmail(val string) {
+	s.Email = val
+}
+
+// SetVersion sets the value of Version.
+func (s *SearchPerson) SetVersion(val int64) {
+	s.Version = val
+}
+
+// SetPersonType sets the value of PersonType.
+func (s *SearchPerson) SetPersonType(val PersonType) {
+	s.PersonType = val
+}
+
+// SetWhenLastAuthenticated sets the value of WhenLastAuthenticated.
+func (s *SearchPerson) SetWhenLastAuthenticated(val OptNilDateTime) {
+	s.WhenLastAuthenticated = val
+}
+
+// SetWhenLastSeen sets the value of WhenLastSeen.
+func (s *SearchPerson) SetWhenLastSeen(val OptNilDateTime) {
+	s.WhenLastSeen = val
+}
+
+// SetWhenDeactivated sets the value of WhenDeactivated.
+func (s *SearchPerson) SetWhenDeactivated(val OptNilDateTime) {
+	s.WhenDeactivated = val
+}
+
+// SetGroupCount sets the value of GroupCount.
+func (s *SearchPerson) SetGroupCount(val int) {
+	s.GroupCount = val
+}
+
+// Ref: #/components/schemas/SearchPersonResult
+type SearchPersonResult struct {
+	Max int `json:"max"`
+	// This is for backwards compatibility.
+	People []Person `json:"people"`
+	// If we return the new result type, we are returning a summarised person for less data.
+	SummarisedPeople         []SearchPerson            `json:"summarisedPeople"`
+	OutstandingRegistrations []OutstandingRegistration `json:"outstandingRegistrations"`
+}
+
+// GetMax returns the value of Max.
+func (s *SearchPersonResult) GetMax() int {
+	return s.Max
+}
+
+// GetPeople returns the value of People.
+func (s *SearchPersonResult) GetPeople() []Person {
+	return s.People
+}
+
+// GetSummarisedPeople returns the value of SummarisedPeople.
+func (s *SearchPersonResult) GetSummarisedPeople() []SearchPerson {
+	return s.SummarisedPeople
+}
+
+// GetOutstandingRegistrations returns the value of OutstandingRegistrations.
+func (s *SearchPersonResult) GetOutstandingRegistrations() []OutstandingRegistration {
+	return s.OutstandingRegistrations
+}
+
+// SetMax sets the value of Max.
+func (s *SearchPersonResult) SetMax(val int) {
+	s.Max = val
+}
+
+// SetPeople sets the value of People.
+func (s *SearchPersonResult) SetPeople(val []Person) {
+	s.People = val
+}
+
+// SetSummarisedPeople sets the value of SummarisedPeople.
+func (s *SearchPersonResult) SetSummarisedPeople(val []SearchPerson) {
+	s.SummarisedPeople = val
+}
+
+// SetOutstandingRegistrations sets the value of OutstandingRegistrations.
+func (s *SearchPersonResult) SetOutstandingRegistrations(val []OutstandingRegistration) {
+	s.OutstandingRegistrations = val
+}
 
 func (*SearchPersonResult) findPeopleRes() {}
 
@@ -7737,7 +9960,137 @@ type SearchServiceAccountsInPortfolioUnauthorized struct{}
 
 func (*SearchServiceAccountsInPortfolioUnauthorized) searchServiceAccountsInPortfolioRes() {}
 
-type ServiceAccount jx.Raw
+// Ref: #/components/schemas/ServiceAccount
+type ServiceAccount struct {
+	ID          uuid.UUID    `json:"id"`
+	Name        string       `json:"name"`
+	PortfolioId OptNilUUID   `json:"portfolioId"`
+	Description OptNilString `json:"description"`
+	Version     OptNilInt64  `json:"version"`
+	// This is a read only field, it denotes an api key where the eval is done client side.
+	ApiKeyClientSide OptNilString `json:"apiKeyClientSide"`
+	// This is a read only field, it denotes an api key where the eval is done server side.
+	ApiKeyServerSide OptNilString    `json:"apiKeyServerSide"`
+	FeatureFilters   OptNilUUIDArray `json:"featureFilters"`
+	// If this is true, then the permissions does not hold the actual permissions of the service account
+	// and should be ignored on update. It is set by the server and can be set on the client when calling
+	// update methods for service accounts. This is because the permissions field is always an array, it
+	// is not nullable. NULL or FALSE means the permissions field is valid and is the default behaviour.
+	// TRUE is new and is recognized by the server to not try and update permissions.
+	PermsInvalid OptNilBool                 `json:"permsInvalid"`
+	Permissions  []ServiceAccountPermission `json:"permissions"`
+	WhenArchived OptNilDateTime             `json:"whenArchived"`
+}
+
+// GetID returns the value of ID.
+func (s *ServiceAccount) GetID() uuid.UUID {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *ServiceAccount) GetName() string {
+	return s.Name
+}
+
+// GetPortfolioId returns the value of PortfolioId.
+func (s *ServiceAccount) GetPortfolioId() OptNilUUID {
+	return s.PortfolioId
+}
+
+// GetDescription returns the value of Description.
+func (s *ServiceAccount) GetDescription() OptNilString {
+	return s.Description
+}
+
+// GetVersion returns the value of Version.
+func (s *ServiceAccount) GetVersion() OptNilInt64 {
+	return s.Version
+}
+
+// GetApiKeyClientSide returns the value of ApiKeyClientSide.
+func (s *ServiceAccount) GetApiKeyClientSide() OptNilString {
+	return s.ApiKeyClientSide
+}
+
+// GetApiKeyServerSide returns the value of ApiKeyServerSide.
+func (s *ServiceAccount) GetApiKeyServerSide() OptNilString {
+	return s.ApiKeyServerSide
+}
+
+// GetFeatureFilters returns the value of FeatureFilters.
+func (s *ServiceAccount) GetFeatureFilters() OptNilUUIDArray {
+	return s.FeatureFilters
+}
+
+// GetPermsInvalid returns the value of PermsInvalid.
+func (s *ServiceAccount) GetPermsInvalid() OptNilBool {
+	return s.PermsInvalid
+}
+
+// GetPermissions returns the value of Permissions.
+func (s *ServiceAccount) GetPermissions() []ServiceAccountPermission {
+	return s.Permissions
+}
+
+// GetWhenArchived returns the value of WhenArchived.
+func (s *ServiceAccount) GetWhenArchived() OptNilDateTime {
+	return s.WhenArchived
+}
+
+// SetID sets the value of ID.
+func (s *ServiceAccount) SetID(val uuid.UUID) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *ServiceAccount) SetName(val string) {
+	s.Name = val
+}
+
+// SetPortfolioId sets the value of PortfolioId.
+func (s *ServiceAccount) SetPortfolioId(val OptNilUUID) {
+	s.PortfolioId = val
+}
+
+// SetDescription sets the value of Description.
+func (s *ServiceAccount) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
+// SetVersion sets the value of Version.
+func (s *ServiceAccount) SetVersion(val OptNilInt64) {
+	s.Version = val
+}
+
+// SetApiKeyClientSide sets the value of ApiKeyClientSide.
+func (s *ServiceAccount) SetApiKeyClientSide(val OptNilString) {
+	s.ApiKeyClientSide = val
+}
+
+// SetApiKeyServerSide sets the value of ApiKeyServerSide.
+func (s *ServiceAccount) SetApiKeyServerSide(val OptNilString) {
+	s.ApiKeyServerSide = val
+}
+
+// SetFeatureFilters sets the value of FeatureFilters.
+func (s *ServiceAccount) SetFeatureFilters(val OptNilUUIDArray) {
+	s.FeatureFilters = val
+}
+
+// SetPermsInvalid sets the value of PermsInvalid.
+func (s *ServiceAccount) SetPermsInvalid(val OptNilBool) {
+	s.PermsInvalid = val
+}
+
+// SetPermissions sets the value of Permissions.
+func (s *ServiceAccount) SetPermissions(val []ServiceAccountPermission) {
+	s.Permissions = val
+}
+
+// SetWhenArchived sets the value of WhenArchived.
+func (s *ServiceAccount) SetWhenArchived(val OptNilDateTime) {
+	s.WhenArchived = val
+}
 
 func (*ServiceAccount) createServiceAccountInPortfolioRes() {}
 func (*ServiceAccount) getServiceAccountRes()               {}
@@ -7745,13 +10098,84 @@ func (*ServiceAccount) resetApiKeyRes()                     {}
 func (*ServiceAccount) updateServiceAccountOnPortfolioRes() {}
 func (*ServiceAccount) updateServiceAccountRes()            {}
 
-type ServiceAccountPermission jx.Raw
+// This represents a specific set of permissions for a SDK service account in an environment.
+// Ref: #/components/schemas/ServiceAccountPermission
+type ServiceAccountPermission struct {
+	ID             OptNilUUID           `json:"id"`
+	Permissions    []RoleType           `json:"permissions"`
+	ServiceAccount OptNilServiceAccount `json:"serviceAccount"`
+	EnvironmentId  uuid.UUID            `json:"environmentId"`
+	// Optional if they have chosen includeSdkUrl.
+	SdkUrlClientEval OptNilString `json:"sdkUrlClientEval"`
+	// Optional if they have chosen includeSdkUrl.
+	SdkUrlServerEval OptNilString `json:"sdkUrlServerEval"`
+}
+
+// GetID returns the value of ID.
+func (s *ServiceAccountPermission) GetID() OptNilUUID {
+	return s.ID
+}
+
+// GetPermissions returns the value of Permissions.
+func (s *ServiceAccountPermission) GetPermissions() []RoleType {
+	return s.Permissions
+}
+
+// GetServiceAccount returns the value of ServiceAccount.
+func (s *ServiceAccountPermission) GetServiceAccount() OptNilServiceAccount {
+	return s.ServiceAccount
+}
+
+// GetEnvironmentId returns the value of EnvironmentId.
+func (s *ServiceAccountPermission) GetEnvironmentId() uuid.UUID {
+	return s.EnvironmentId
+}
+
+// GetSdkUrlClientEval returns the value of SdkUrlClientEval.
+func (s *ServiceAccountPermission) GetSdkUrlClientEval() OptNilString {
+	return s.SdkUrlClientEval
+}
+
+// GetSdkUrlServerEval returns the value of SdkUrlServerEval.
+func (s *ServiceAccountPermission) GetSdkUrlServerEval() OptNilString {
+	return s.SdkUrlServerEval
+}
+
+// SetID sets the value of ID.
+func (s *ServiceAccountPermission) SetID(val OptNilUUID) {
+	s.ID = val
+}
+
+// SetPermissions sets the value of Permissions.
+func (s *ServiceAccountPermission) SetPermissions(val []RoleType) {
+	s.Permissions = val
+}
+
+// SetServiceAccount sets the value of ServiceAccount.
+func (s *ServiceAccountPermission) SetServiceAccount(val OptNilServiceAccount) {
+	s.ServiceAccount = val
+}
+
+// SetEnvironmentId sets the value of EnvironmentId.
+func (s *ServiceAccountPermission) SetEnvironmentId(val uuid.UUID) {
+	s.EnvironmentId = val
+}
+
+// SetSdkUrlClientEval sets the value of SdkUrlClientEval.
+func (s *ServiceAccountPermission) SetSdkUrlClientEval(val OptNilString) {
+	s.SdkUrlClientEval = val
+}
+
+// SetSdkUrlServerEval sets the value of SdkUrlServerEval.
+func (s *ServiceAccountPermission) SetSdkUrlServerEval(val OptNilString) {
+	s.SdkUrlServerEval = val
+}
 
 // Ref: #/components/schemas/SetupMissingResponse
 type SetupMissingResponse struct {
-	Providers      []string                              `json:"providers"`
-	CapabilityInfo OptSetupMissingResponseCapabilityInfo `json:"capabilityInfo"`
-	ProviderInfo   OptSetupMissingResponseProviderInfo   `json:"providerInfo"`
+	Providers      []string                            `json:"providers"`
+	CapabilityInfo jx.Raw                              `json:"capabilityInfo"`
+	ProviderInfo   OptSetupMissingResponseProviderInfo `json:"providerInfo"`
 }
 
 // GetProviders returns the value of Providers.
@@ -7760,7 +10184,7 @@ func (s *SetupMissingResponse) GetProviders() []string {
 }
 
 // GetCapabilityInfo returns the value of CapabilityInfo.
-func (s *SetupMissingResponse) GetCapabilityInfo() OptSetupMissingResponseCapabilityInfo {
+func (s *SetupMissingResponse) GetCapabilityInfo() jx.Raw {
 	return s.CapabilityInfo
 }
 
@@ -7775,7 +10199,7 @@ func (s *SetupMissingResponse) SetProviders(val []string) {
 }
 
 // SetCapabilityInfo sets the value of CapabilityInfo.
-func (s *SetupMissingResponse) SetCapabilityInfo(val OptSetupMissingResponseCapabilityInfo) {
+func (s *SetupMissingResponse) SetCapabilityInfo(val jx.Raw) {
 	s.CapabilityInfo = val
 }
 
@@ -7785,17 +10209,6 @@ func (s *SetupMissingResponse) SetProviderInfo(val OptSetupMissingResponseProvid
 }
 
 func (*SetupMissingResponse) isInstalledRes() {}
-
-type SetupMissingResponseCapabilityInfo map[string]string
-
-func (s *SetupMissingResponseCapabilityInfo) init() SetupMissingResponseCapabilityInfo {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
-}
 
 type SetupMissingResponseProviderInfo map[string]IdentityProviderInfo
 
@@ -7810,10 +10223,10 @@ func (s *SetupMissingResponseProviderInfo) init() SetupMissingResponseProviderIn
 
 // Ref: #/components/schemas/SetupResponse
 type SetupResponse struct {
-	Organization   Organization                `json:"organization"`
-	Providers      []string                    `json:"providers"`
-	ProviderInfo   SetupResponseProviderInfo   `json:"providerInfo"`
-	CapabilityInfo SetupResponseCapabilityInfo `json:"capabilityInfo"`
+	Organization   Organization              `json:"organization"`
+	Providers      []string                  `json:"providers"`
+	ProviderInfo   SetupResponseProviderInfo `json:"providerInfo"`
+	CapabilityInfo jx.Raw                    `json:"capabilityInfo"`
 	// Set if there is only one external provider and no local. Allows immediate redirect to provider. It
 	// assumes it will be used immediate (e.g. state in oauth2 url).
 	RedirectUrl OptNilString `json:"redirectUrl"`
@@ -7835,7 +10248,7 @@ func (s *SetupResponse) GetProviderInfo() SetupResponseProviderInfo {
 }
 
 // GetCapabilityInfo returns the value of CapabilityInfo.
-func (s *SetupResponse) GetCapabilityInfo() SetupResponseCapabilityInfo {
+func (s *SetupResponse) GetCapabilityInfo() jx.Raw {
 	return s.CapabilityInfo
 }
 
@@ -7860,7 +10273,7 @@ func (s *SetupResponse) SetProviderInfo(val SetupResponseProviderInfo) {
 }
 
 // SetCapabilityInfo sets the value of CapabilityInfo.
-func (s *SetupResponse) SetCapabilityInfo(val SetupResponseCapabilityInfo) {
+func (s *SetupResponse) SetCapabilityInfo(val jx.Raw) {
 	s.CapabilityInfo = val
 }
 
@@ -7870,17 +10283,6 @@ func (s *SetupResponse) SetRedirectUrl(val OptNilString) {
 }
 
 func (*SetupResponse) isInstalledRes() {}
-
-type SetupResponseCapabilityInfo map[string]string
-
-func (s *SetupResponseCapabilityInfo) init() SetupResponseCapabilityInfo {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
-}
 
 type SetupResponseProviderInfo map[string]IdentityProviderInfo
 
@@ -7985,12 +10387,12 @@ func (*SetupSiteAdminUnauthorized) setupSiteAdminRes() {}
 
 // Ref: #/components/schemas/SharedRolloutStrategyViolation
 type SharedRolloutStrategyViolation struct {
-	Strategy  RolloutStrategyInstance    `json:"strategy"`
+	Strategy  OptRolloutStrategyInstance `json:"strategy"`
 	Violation []RolloutStrategyViolation `json:"violation"`
 }
 
 // GetStrategy returns the value of Strategy.
-func (s *SharedRolloutStrategyViolation) GetStrategy() RolloutStrategyInstance {
+func (s *SharedRolloutStrategyViolation) GetStrategy() OptRolloutStrategyInstance {
 	return s.Strategy
 }
 
@@ -8000,7 +10402,7 @@ func (s *SharedRolloutStrategyViolation) GetViolation() []RolloutStrategyViolati
 }
 
 // SetStrategy sets the value of Strategy.
-func (s *SharedRolloutStrategyViolation) SetStrategy(val RolloutStrategyInstance) {
+func (s *SharedRolloutStrategyViolation) SetStrategy(val OptRolloutStrategyInstance) {
 	s.Strategy = val
 }
 
@@ -8170,7 +10572,103 @@ type TestWebhookUnauthorized struct{}
 
 func (*TestWebhookUnauthorized) testWebhookRes() {}
 
-type TokenizedPerson jx.Raw
+// Ref: #/components/schemas/ThinGroupRolloutStrategy
+type ThinGroupRolloutStrategy struct {
+	Name OptString `json:"name"`
+	// The value for this strategy, currently always a string.
+	Value jx.Raw `json:"value"`
+	// The id of the associated feature group.
+	FeatureGroupId OptNilUUID `json:"featureGroupId"`
+}
+
+// GetName returns the value of Name.
+func (s *ThinGroupRolloutStrategy) GetName() OptString {
+	return s.Name
+}
+
+// GetValue returns the value of Value.
+func (s *ThinGroupRolloutStrategy) GetValue() jx.Raw {
+	return s.Value
+}
+
+// GetFeatureGroupId returns the value of FeatureGroupId.
+func (s *ThinGroupRolloutStrategy) GetFeatureGroupId() OptNilUUID {
+	return s.FeatureGroupId
+}
+
+// SetName sets the value of Name.
+func (s *ThinGroupRolloutStrategy) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetValue sets the value of Value.
+func (s *ThinGroupRolloutStrategy) SetValue(val jx.Raw) {
+	s.Value = val
+}
+
+// SetFeatureGroupId sets the value of FeatureGroupId.
+func (s *ThinGroupRolloutStrategy) SetFeatureGroupId(val OptNilUUID) {
+	s.FeatureGroupId = val
+}
+
+// Ref: #/components/schemas/TokenizedPerson
+type TokenizedPerson struct {
+	AccessToken    OptNilString `json:"accessToken"`
+	RefreshToken   OptNilString `json:"refreshToken"`
+	RedirectUrl    OptNilString `json:"redirectUrl"`
+	CapabilityInfo jx.Raw       `json:"capabilityInfo"`
+	Person         OptNilPerson `json:"person"`
+}
+
+// GetAccessToken returns the value of AccessToken.
+func (s *TokenizedPerson) GetAccessToken() OptNilString {
+	return s.AccessToken
+}
+
+// GetRefreshToken returns the value of RefreshToken.
+func (s *TokenizedPerson) GetRefreshToken() OptNilString {
+	return s.RefreshToken
+}
+
+// GetRedirectUrl returns the value of RedirectUrl.
+func (s *TokenizedPerson) GetRedirectUrl() OptNilString {
+	return s.RedirectUrl
+}
+
+// GetCapabilityInfo returns the value of CapabilityInfo.
+func (s *TokenizedPerson) GetCapabilityInfo() jx.Raw {
+	return s.CapabilityInfo
+}
+
+// GetPerson returns the value of Person.
+func (s *TokenizedPerson) GetPerson() OptNilPerson {
+	return s.Person
+}
+
+// SetAccessToken sets the value of AccessToken.
+func (s *TokenizedPerson) SetAccessToken(val OptNilString) {
+	s.AccessToken = val
+}
+
+// SetRefreshToken sets the value of RefreshToken.
+func (s *TokenizedPerson) SetRefreshToken(val OptNilString) {
+	s.RefreshToken = val
+}
+
+// SetRedirectUrl sets the value of RedirectUrl.
+func (s *TokenizedPerson) SetRedirectUrl(val OptNilString) {
+	s.RedirectUrl = val
+}
+
+// SetCapabilityInfo sets the value of CapabilityInfo.
+func (s *TokenizedPerson) SetCapabilityInfo(val jx.Raw) {
+	s.CapabilityInfo = val
+}
+
+// SetPerson sets the value of Person.
+func (s *TokenizedPerson) SetPerson(val OptNilPerson) {
+	s.Person = val
+}
 
 func (*TokenizedPerson) loginRes()               {}
 func (*TokenizedPerson) registerPersonRes()      {}
@@ -8179,10 +10677,10 @@ func (*TokenizedPerson) setupSiteAdminRes()      {}
 
 // Ref: #/components/schemas/TrackEventResponse
 type TrackEventResponse struct {
-	Status       OptInt                          `json:"status"`
-	WhenReceived OptDateTime                     `json:"whenReceived"`
-	Message      OptNilString                    `json:"message"`
-	Headers      OptNilTrackEventResponseHeaders `json:"headers"`
+	Status       OptInt       `json:"status"`
+	WhenReceived OptDateTime  `json:"whenReceived"`
+	Message      OptNilString `json:"message"`
+	Headers      jx.Raw       `json:"headers"`
 }
 
 // GetStatus returns the value of Status.
@@ -8201,7 +10699,7 @@ func (s *TrackEventResponse) GetMessage() OptNilString {
 }
 
 // GetHeaders returns the value of Headers.
-func (s *TrackEventResponse) GetHeaders() OptNilTrackEventResponseHeaders {
+func (s *TrackEventResponse) GetHeaders() jx.Raw {
 	return s.Headers
 }
 
@@ -8221,19 +10719,8 @@ func (s *TrackEventResponse) SetMessage(val OptNilString) {
 }
 
 // SetHeaders sets the value of Headers.
-func (s *TrackEventResponse) SetHeaders(val OptNilTrackEventResponseHeaders) {
+func (s *TrackEventResponse) SetHeaders(val jx.Raw) {
 	s.Headers = val
-}
-
-type TrackEventResponseHeaders map[string]string
-
-func (s *TrackEventResponseHeaders) init() TrackEventResponseHeaders {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
 }
 
 // Ref: #/components/schemas/TrackEventsSummary
@@ -8569,10 +11056,10 @@ type UpdateEnvironment struct {
 	Production OptNilBool `json:"production"`
 	// Allows some settings that affect the behaviour of this environment. Currently `cacheControl` if
 	// set will be passed and set on the responses to GET requests.
-	EnvironmentInfo OptNilUpdateEnvironmentEnvironmentInfo `json:"environmentInfo"`
+	EnvironmentInfo jx.Raw `json:"environmentInfo"`
 	// Environment webhook url and headers.
-	WebhookEnvironmentInfo OptNilUpdateEnvironmentWebhookEnvironmentInfo `json:"webhookEnvironmentInfo"`
-	PriorEnvironmentId     OptNilUUID                                    `json:"priorEnvironmentId"`
+	WebhookEnvironmentInfo jx.Raw     `json:"webhookEnvironmentInfo"`
+	PriorEnvironmentId     OptNilUUID `json:"priorEnvironmentId"`
 }
 
 // GetVersion returns the value of Version.
@@ -8596,12 +11083,12 @@ func (s *UpdateEnvironment) GetProduction() OptNilBool {
 }
 
 // GetEnvironmentInfo returns the value of EnvironmentInfo.
-func (s *UpdateEnvironment) GetEnvironmentInfo() OptNilUpdateEnvironmentEnvironmentInfo {
+func (s *UpdateEnvironment) GetEnvironmentInfo() jx.Raw {
 	return s.EnvironmentInfo
 }
 
 // GetWebhookEnvironmentInfo returns the value of WebhookEnvironmentInfo.
-func (s *UpdateEnvironment) GetWebhookEnvironmentInfo() OptNilUpdateEnvironmentWebhookEnvironmentInfo {
+func (s *UpdateEnvironment) GetWebhookEnvironmentInfo() jx.Raw {
 	return s.WebhookEnvironmentInfo
 }
 
@@ -8631,12 +11118,12 @@ func (s *UpdateEnvironment) SetProduction(val OptNilBool) {
 }
 
 // SetEnvironmentInfo sets the value of EnvironmentInfo.
-func (s *UpdateEnvironment) SetEnvironmentInfo(val OptNilUpdateEnvironmentEnvironmentInfo) {
+func (s *UpdateEnvironment) SetEnvironmentInfo(val jx.Raw) {
 	s.EnvironmentInfo = val
 }
 
 // SetWebhookEnvironmentInfo sets the value of WebhookEnvironmentInfo.
-func (s *UpdateEnvironment) SetWebhookEnvironmentInfo(val OptNilUpdateEnvironmentWebhookEnvironmentInfo) {
+func (s *UpdateEnvironment) SetWebhookEnvironmentInfo(val jx.Raw) {
 	s.WebhookEnvironmentInfo = val
 }
 
@@ -8654,19 +11141,6 @@ func (*UpdateEnvironmentBadRequest) updateEnvironmentRes() {}
 type UpdateEnvironmentConflict struct{}
 
 func (*UpdateEnvironmentConflict) updateEnvironmentRes() {}
-
-// Allows some settings that affect the behaviour of this environment. Currently `cacheControl` if
-// set will be passed and set on the responses to GET requests.
-type UpdateEnvironmentEnvironmentInfo map[string]string
-
-func (s *UpdateEnvironmentEnvironmentInfo) init() UpdateEnvironmentEnvironmentInfo {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
-}
 
 // UpdateEnvironmentNotFound is response for UpdateEnvironment operation.
 type UpdateEnvironmentNotFound struct{}
@@ -8719,11 +11193,11 @@ type UpdateEnvironmentV2 struct {
 	Production OptNilBool `json:"production"`
 	// Allows some settings that affect the behaviour of this environment. Currently `cacheControl` if
 	// set will be passed and set on the responses to GET requests.
-	EnvironmentInfo OptNilUpdateEnvironmentV2EnvironmentInfo `json:"environmentInfo"`
+	EnvironmentInfo jx.Raw `json:"environmentInfo"`
 	// Environment webhook url and headers.
-	WebhookEnvironmentInfo OptNilUpdateEnvironmentV2WebhookEnvironmentInfo `json:"webhookEnvironmentInfo"`
-	PriorEnvironmentId     OptNilUUID                                      `json:"priorEnvironmentId"`
-	ID                     uuid.UUID                                       `json:"id"`
+	WebhookEnvironmentInfo jx.Raw     `json:"webhookEnvironmentInfo"`
+	PriorEnvironmentId     OptNilUUID `json:"priorEnvironmentId"`
+	ID                     uuid.UUID  `json:"id"`
 }
 
 // GetVersion returns the value of Version.
@@ -8747,12 +11221,12 @@ func (s *UpdateEnvironmentV2) GetProduction() OptNilBool {
 }
 
 // GetEnvironmentInfo returns the value of EnvironmentInfo.
-func (s *UpdateEnvironmentV2) GetEnvironmentInfo() OptNilUpdateEnvironmentV2EnvironmentInfo {
+func (s *UpdateEnvironmentV2) GetEnvironmentInfo() jx.Raw {
 	return s.EnvironmentInfo
 }
 
 // GetWebhookEnvironmentInfo returns the value of WebhookEnvironmentInfo.
-func (s *UpdateEnvironmentV2) GetWebhookEnvironmentInfo() OptNilUpdateEnvironmentV2WebhookEnvironmentInfo {
+func (s *UpdateEnvironmentV2) GetWebhookEnvironmentInfo() jx.Raw {
 	return s.WebhookEnvironmentInfo
 }
 
@@ -8787,12 +11261,12 @@ func (s *UpdateEnvironmentV2) SetProduction(val OptNilBool) {
 }
 
 // SetEnvironmentInfo sets the value of EnvironmentInfo.
-func (s *UpdateEnvironmentV2) SetEnvironmentInfo(val OptNilUpdateEnvironmentV2EnvironmentInfo) {
+func (s *UpdateEnvironmentV2) SetEnvironmentInfo(val jx.Raw) {
 	s.EnvironmentInfo = val
 }
 
 // SetWebhookEnvironmentInfo sets the value of WebhookEnvironmentInfo.
-func (s *UpdateEnvironmentV2) SetWebhookEnvironmentInfo(val OptNilUpdateEnvironmentV2WebhookEnvironmentInfo) {
+func (s *UpdateEnvironmentV2) SetWebhookEnvironmentInfo(val jx.Raw) {
 	s.WebhookEnvironmentInfo = val
 }
 
@@ -8816,19 +11290,6 @@ type UpdateEnvironmentV2Conflict struct{}
 
 func (*UpdateEnvironmentV2Conflict) updateEnvironmentV2Res() {}
 
-// Allows some settings that affect the behaviour of this environment. Currently `cacheControl` if
-// set will be passed and set on the responses to GET requests.
-type UpdateEnvironmentV2EnvironmentInfo map[string]string
-
-func (s *UpdateEnvironmentV2EnvironmentInfo) init() UpdateEnvironmentV2EnvironmentInfo {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
-}
-
 // UpdateEnvironmentV2NotFound is response for UpdateEnvironmentV2 operation.
 type UpdateEnvironmentV2NotFound struct{}
 
@@ -8844,29 +11305,25 @@ type UpdateEnvironmentV2UnprocessableEntity struct{}
 
 func (*UpdateEnvironmentV2UnprocessableEntity) updateEnvironmentV2Res() {}
 
-// Environment webhook url and headers.
-type UpdateEnvironmentV2WebhookEnvironmentInfo map[string]string
+// UpdateFeatureFilterBadRequest is response for UpdateFeatureFilter operation.
+type UpdateFeatureFilterBadRequest struct{}
 
-func (s *UpdateEnvironmentV2WebhookEnvironmentInfo) init() UpdateEnvironmentV2WebhookEnvironmentInfo {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
-}
+func (*UpdateFeatureFilterBadRequest) updateFeatureFilterRes() {}
 
-// Environment webhook url and headers.
-type UpdateEnvironmentWebhookEnvironmentInfo map[string]string
+// UpdateFeatureFilterConflict is response for UpdateFeatureFilter operation.
+type UpdateFeatureFilterConflict struct{}
 
-func (s *UpdateEnvironmentWebhookEnvironmentInfo) init() UpdateEnvironmentWebhookEnvironmentInfo {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
-}
+func (*UpdateFeatureFilterConflict) updateFeatureFilterRes() {}
+
+// UpdateFeatureFilterNotFound is response for UpdateFeatureFilter operation.
+type UpdateFeatureFilterNotFound struct{}
+
+func (*UpdateFeatureFilterNotFound) updateFeatureFilterRes() {}
+
+// UpdateFeatureFilterUnauthorized is response for UpdateFeatureFilter operation.
+type UpdateFeatureFilterUnauthorized struct{}
+
+func (*UpdateFeatureFilterUnauthorized) updateFeatureFilterRes() {}
 
 // UpdateFeatureForApplicationBadRequest is response for UpdateFeatureForApplication operation.
 type UpdateFeatureForApplicationBadRequest struct{}
@@ -9333,7 +11790,31 @@ func (s *UpdatedSystemConfigs) SetConfigs(val []UpdatedSystemConfig) {
 	s.Configs = val
 }
 
-type UserCredentials jx.Raw
+// Ref: #/components/schemas/UserCredentials
+type UserCredentials struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+// GetEmail returns the value of Email.
+func (s *UserCredentials) GetEmail() string {
+	return s.Email
+}
+
+// GetPassword returns the value of Password.
+func (s *UserCredentials) GetPassword() string {
+	return s.Password
+}
+
+// SetEmail sets the value of Email.
+func (s *UserCredentials) SetEmail(val string) {
+	s.Email = val
+}
+
+// SetPassword sets the value of Password.
+func (s *UserCredentials) SetPassword(val string) {
+	s.Password = val
+}
 
 // ValidateBadRequest is response for Validate operation.
 type ValidateBadRequest struct{}
@@ -9352,7 +11833,7 @@ type WebhookCheck struct {
 	// Any configuration to pass to the check, e.g. webhook.feature.url, headers, etc - this ensures the
 	// updates get to the destination and are used. They get merged info the envInfo, replacing anything
 	// there.
-	Config WebhookCheckConfig `json:"config"`
+	Config jx.Raw `json:"config"`
 }
 
 // GetMessageType returns the value of MessageType.
@@ -9366,7 +11847,7 @@ func (s *WebhookCheck) GetEnvId() uuid.UUID {
 }
 
 // GetConfig returns the value of Config.
-func (s *WebhookCheck) GetConfig() WebhookCheckConfig {
+func (s *WebhookCheck) GetConfig() jx.Raw {
 	return s.Config
 }
 
@@ -9381,22 +11862,8 @@ func (s *WebhookCheck) SetEnvId(val uuid.UUID) {
 }
 
 // SetConfig sets the value of Config.
-func (s *WebhookCheck) SetConfig(val WebhookCheckConfig) {
+func (s *WebhookCheck) SetConfig(val jx.Raw) {
 	s.Config = val
-}
-
-// Any configuration to pass to the check, e.g. webhook.feature.url, headers, etc - this ensures the
-// updates get to the destination and are used. They get merged info the envInfo, replacing anything
-// there.
-type WebhookCheckConfig map[string]string
-
-func (s *WebhookCheckConfig) init() WebhookCheckConfig {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
 }
 
 // Webhook data.
@@ -9413,9 +11880,9 @@ type WebhookDetail struct {
 	// The URL requested, only if Admin.
 	URL OptNilString `json:"url"`
 	// The headers we set on the outbound call, only if Admin.
-	OutboundHeaders OptNilWebhookDetailOutboundHeaders `json:"outboundHeaders"`
+	OutboundHeaders jx.Raw `json:"outboundHeaders"`
 	// The headers that came back, only if Admin.
-	IncomingHeaders OptNilWebhookDetailIncomingHeaders `json:"incomingHeaders"`
+	IncomingHeaders jx.Raw `json:"incomingHeaders"`
 	// The body as a string if any, truncated to 1k.
 	Result OptString `json:"result"`
 }
@@ -9461,12 +11928,12 @@ func (s *WebhookDetail) GetURL() OptNilString {
 }
 
 // GetOutboundHeaders returns the value of OutboundHeaders.
-func (s *WebhookDetail) GetOutboundHeaders() OptNilWebhookDetailOutboundHeaders {
+func (s *WebhookDetail) GetOutboundHeaders() jx.Raw {
 	return s.OutboundHeaders
 }
 
 // GetIncomingHeaders returns the value of IncomingHeaders.
-func (s *WebhookDetail) GetIncomingHeaders() OptNilWebhookDetailIncomingHeaders {
+func (s *WebhookDetail) GetIncomingHeaders() jx.Raw {
 	return s.IncomingHeaders
 }
 
@@ -9516,12 +11983,12 @@ func (s *WebhookDetail) SetURL(val OptNilString) {
 }
 
 // SetOutboundHeaders sets the value of OutboundHeaders.
-func (s *WebhookDetail) SetOutboundHeaders(val OptNilWebhookDetailOutboundHeaders) {
+func (s *WebhookDetail) SetOutboundHeaders(val jx.Raw) {
 	s.OutboundHeaders = val
 }
 
 // SetIncomingHeaders sets the value of IncomingHeaders.
-func (s *WebhookDetail) SetIncomingHeaders(val OptNilWebhookDetailIncomingHeaders) {
+func (s *WebhookDetail) SetIncomingHeaders(val jx.Raw) {
 	s.IncomingHeaders = val
 }
 
@@ -9531,30 +11998,6 @@ func (s *WebhookDetail) SetResult(val OptString) {
 }
 
 func (*WebhookDetail) getWebhookDetailsRes() {}
-
-// The headers that came back, only if Admin.
-type WebhookDetailIncomingHeaders map[string]string
-
-func (s *WebhookDetailIncomingHeaders) init() WebhookDetailIncomingHeaders {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
-}
-
-// The headers we set on the outbound call, only if Admin.
-type WebhookDetailOutboundHeaders map[string]string
-
-func (s *WebhookDetailOutboundHeaders) init() WebhookDetailOutboundHeaders {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
-}
 
 // Ref: #/components/schemas/WebhookSummary
 type WebhookSummary struct {

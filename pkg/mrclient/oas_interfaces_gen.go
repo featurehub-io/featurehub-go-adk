@@ -33,6 +33,10 @@ type CreateEnvironmentRes interface {
 	createEnvironmentRes()
 }
 
+type CreateFeatureFilterRes interface {
+	createFeatureFilterRes()
+}
+
 type CreateFeatureForEnvironmentRes interface {
 	createFeatureForEnvironmentRes()
 }
@@ -79,6 +83,10 @@ type DeleteApplicationStrategyRes interface {
 
 type DeleteEnvironmentRes interface {
 	deleteEnvironmentRes()
+}
+
+type DeleteFeatureFilterRes interface {
+	deleteFeatureFilterRes()
 }
 
 type DeleteFeatureForApplicationRes interface {
@@ -129,6 +137,10 @@ type FindEnvironmentsRes interface {
 	findEnvironmentsRes()
 }
 
+type FindFeatureFiltersRes interface {
+	findFeatureFiltersRes()
+}
+
 type FindGroupsRes interface {
 	findGroupsRes()
 }
@@ -165,6 +177,10 @@ type GetFeatureByKeyRes interface {
 	getFeatureByKeyRes()
 }
 
+type GetFeatureFilterRes interface {
+	getFeatureFilterRes()
+}
+
 type GetFeatureForEnvironmentRes interface {
 	getFeatureForEnvironmentRes()
 }
@@ -191,6 +207,10 @@ type GetHiddenEnvironmentsRes interface {
 
 type GetLoginUrlForProviderRes interface {
 	getLoginUrlForProviderRes()
+}
+
+type GetMatchingFiltersRes interface {
+	getMatchingFiltersRes()
 }
 
 type GetPersonRes interface {
@@ -331,6 +351,10 @@ type UpdateEnvironmentRes interface {
 
 type UpdateEnvironmentV2Res interface {
 	updateEnvironmentV2Res()
+}
+
+type UpdateFeatureFilterRes interface {
+	updateFeatureFilterRes()
 }
 
 type UpdateFeatureForApplicationOnFeatureRes interface {

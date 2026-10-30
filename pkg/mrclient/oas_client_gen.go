@@ -51,7 +51,7 @@ type Invoker interface {
 	// Change password.
 	//
 	// PUT /mr-api/authentication/{id}/changePassword
-	ChangePassword(ctx context.Context, request PasswordUpdate, params ChangePasswordParams) (ChangePasswordRes, error)
+	ChangePassword(ctx context.Context, request *PasswordUpdate, params ChangePasswordParams) (ChangePasswordRes, error)
 	// CreateApplication invokes createApplication operation.
 	//
 	// Create a new application.
@@ -77,12 +77,16 @@ type Invoker interface {
 	//
 	// POST /mr-api/application/{id}/environment
 	CreateEnvironmentOnApplication(ctx context.Context, request *CreateEnvironment, params CreateEnvironmentOnApplicationParams) (CreateEnvironmentOnApplicationRes, error)
+	// CreateFeatureFilter invokes createFeatureFilter operation.
+	//
+	// POST /mr-api/portfolio/{id}/feature-filter
+	CreateFeatureFilter(ctx context.Context, request *CreateFeatureFilter, params CreateFeatureFilterParams) (CreateFeatureFilterRes, error)
 	// CreateFeatureForEnvironment invokes createFeatureForEnvironment operation.
 	//
 	// Create a specific feature in this environment.
 	//
 	// POST /mr-api/features/{eid}/feature/{key}
-	CreateFeatureForEnvironment(ctx context.Context, request FeatureValue, params CreateFeatureForEnvironmentParams) (CreateFeatureForEnvironmentRes, error)
+	CreateFeatureForEnvironment(ctx context.Context, request *FeatureValue, params CreateFeatureForEnvironmentParams) (CreateFeatureForEnvironmentRes, error)
 	// CreateFeatureGroup invokes createFeatureGroup operation.
 	//
 	// Get feature groups for this application.
@@ -94,7 +98,7 @@ type Invoker interface {
 	// Add a new feature to this application, returns all features.
 	//
 	// POST /mr-api/application/{id}/features
-	CreateFeaturesForApplication(ctx context.Context, request CreateFeature, params CreateFeaturesForApplicationParams) (CreateFeaturesForApplicationRes, error)
+	CreateFeaturesForApplication(ctx context.Context, request *CreateFeature, params CreateFeaturesForApplicationParams) (CreateFeaturesForApplicationRes, error)
 	// CreateGroup invokes createGroup operation.
 	//
 	// Create a new group.
@@ -112,7 +116,7 @@ type Invoker interface {
 	// Create a new person.
 	//
 	// POST /mr-api/person
-	CreatePerson(ctx context.Context, request CreatePersonDetails, params CreatePersonParams) (CreatePersonRes, error)
+	CreatePerson(ctx context.Context, request *CreatePersonDetails, params CreatePersonParams) (CreatePersonRes, error)
 	// CreatePortfolio invokes createPortfolio operation.
 	//
 	// Create a new portfolio.
@@ -124,7 +128,7 @@ type Invoker interface {
 	// Add a new service account.
 	//
 	// POST /mr-api/portfolio/{id}/service-account
-	CreateServiceAccountInPortfolio(ctx context.Context, request CreateServiceAccount, params CreateServiceAccountInPortfolioParams) (CreateServiceAccountInPortfolioRes, error)
+	CreateServiceAccountInPortfolio(ctx context.Context, request *CreateServiceAccount, params CreateServiceAccountInPortfolioParams) (CreateServiceAccountInPortfolioRes, error)
 	// DecryptSystemConfig invokes decryptSystemConfig operation.
 	//
 	// When passed a key and decrypt is enabled and the user has the right permissions, it will decrypt
@@ -148,6 +152,13 @@ type Invoker interface {
 	//
 	// DELETE /mr-api/environment/{eid}
 	DeleteEnvironment(ctx context.Context, params DeleteEnvironmentParams) (DeleteEnvironmentRes, error)
+	// DeleteFeatureFilter invokes deleteFeatureFilter operation.
+	//
+	// Delete the filter, it must have the same ID and version as the existing one to be successfully
+	// deleted.
+	//
+	// DELETE /mr-api/portfolio/{id}/feature-filter/{filterId}
+	DeleteFeatureFilter(ctx context.Context, params DeleteFeatureFilterParams) (DeleteFeatureFilterRes, error)
 	// DeleteFeatureForApplication invokes deleteFeatureForApplication operation.
 	//
 	// Updates all named features in this application, returns all features.
@@ -221,6 +232,12 @@ type Invoker interface {
 	//
 	// GET /mr-api/application/{id}/environment
 	FindEnvironments(ctx context.Context, params FindEnvironmentsParams) (FindEnvironmentsRes, error)
+	// FindFeatureFilters invokes findFeatureFilters operation.
+	//
+	// Gets all of the feature filters listed in this portfolio with appropriate filtering.
+	//
+	// GET /mr-api/portfolio/{id}/feature-filter
+	FindFeatureFilters(ctx context.Context, params FindFeatureFiltersParams) (FindFeatureFiltersRes, error)
 	// FindGroups invokes findGroups operation.
 	//
 	// Gets a list of groups.
@@ -273,6 +290,10 @@ type Invoker interface {
 	//
 	// GET /mr-api/application/{id}/features/{key}
 	GetFeatureByKey(ctx context.Context, params GetFeatureByKeyParams) (GetFeatureByKeyRes, error)
+	// GetFeatureFilter invokes getFeatureFilter operation.
+	//
+	// GET /mr-api/portfolio/{id}/feature-filter/{filterId}
+	GetFeatureFilter(ctx context.Context, params GetFeatureFilterParams) (GetFeatureFilterRes, error)
 	// GetFeatureForEnvironment invokes getFeatureForEnvironment operation.
 	//
 	// Update a specific feature in this environment.
@@ -321,6 +342,10 @@ type Invoker interface {
 	//
 	// GET /mr-api/external-provider/{provider}
 	GetLoginUrlForProvider(ctx context.Context, params GetLoginUrlForProviderParams) (GetLoginUrlForProviderRes, error)
+	// GetMatchingFilters invokes getMatchingFilters operation.
+	//
+	// GET /mr-api/portfolio/{id}/feature-filter/matching/{matchType}
+	GetMatchingFilters(ctx context.Context, params GetMatchingFiltersParams) (GetMatchingFiltersRes, error)
 	// GetPerson invokes getPerson operation.
 	//
 	// Get person.
@@ -404,7 +429,7 @@ type Invoker interface {
 	// Login to Feature Hub.
 	//
 	// POST /mr-api/login
-	Login(ctx context.Context, request UserCredentials) (LoginRes, error)
+	Login(ctx context.Context, request *UserCredentials) (LoginRes, error)
 	// Logout invokes logout operation.
 	//
 	// Get person by token.
@@ -422,13 +447,13 @@ type Invoker interface {
 	// Create a new user.
 	//
 	// POST /mr-api/authentication
-	RegisterPerson(ctx context.Context, request PersonRegistrationDetails) (RegisterPersonRes, error)
+	RegisterPerson(ctx context.Context, request *PersonRegistrationDetails) (RegisterPersonRes, error)
 	// ReplaceTempPassword invokes replaceTempPassword operation.
 	//
 	// Replace temporary password.
 	//
 	// PUT /mr-api/authentication/{id}/replaceTempPassword
-	ReplaceTempPassword(ctx context.Context, request PasswordReset, params ReplaceTempPasswordParams) (ReplaceTempPasswordRes, error)
+	ReplaceTempPassword(ctx context.Context, request *PasswordReset, params ReplaceTempPasswordParams) (ReplaceTempPasswordRes, error)
 	// ResetApiKey invokes resetApiKey operation.
 	//
 	// Causes a new API Key to be generated. Ensure you confirm this with the user.
@@ -446,7 +471,7 @@ type Invoker interface {
 	// Reset password.
 	//
 	// PUT /mr-api/authentication/{id}/resetPassword
-	ResetPassword(ctx context.Context, request PasswordReset, params ResetPasswordParams) (ResetPasswordRes, error)
+	ResetPassword(ctx context.Context, request *PasswordReset, params ResetPasswordParams) (ResetPasswordRes, error)
 	// ResetSecurityToken invokes resetSecurityToken operation.
 	//
 	// Reset security token of supported person type (usually service accounts only).
@@ -536,26 +561,30 @@ type Invoker interface {
 	//
 	// PUT /mr-api/environment/{eid}/v2
 	UpdateEnvironmentV2(ctx context.Context, request *UpdateEnvironment, params UpdateEnvironmentV2Params) (UpdateEnvironmentV2Res, error)
+	// UpdateFeatureFilter invokes updateFeatureFilter operation.
+	//
+	// PUT /mr-api/portfolio/{id}/feature-filter
+	UpdateFeatureFilter(ctx context.Context, request *FeatureFilter, params UpdateFeatureFilterParams) (UpdateFeatureFilterRes, error)
 	// UpdateFeatureForApplication invokes updateFeatureForApplication operation.
 	//
 	// Updates all named features in this application, returns all features. Use this ONLY if you wish to
 	// change the key.
 	//
 	// PUT /mr-api/application/{id}/features/{key}
-	UpdateFeatureForApplication(ctx context.Context, request Feature, params UpdateFeatureForApplicationParams) (UpdateFeatureForApplicationRes, error)
+	UpdateFeatureForApplication(ctx context.Context, request *Feature, params UpdateFeatureForApplicationParams) (UpdateFeatureForApplicationRes, error)
 	// UpdateFeatureForApplicationOnFeature invokes updateFeatureForApplicationOnFeature operation.
 	//
 	// Updates all named features in this application, returns all features by default otherwise just the
 	// feature updated.
 	//
 	// PUT /mr-api/application/{id}/features
-	UpdateFeatureForApplicationOnFeature(ctx context.Context, request Feature, params UpdateFeatureForApplicationOnFeatureParams) (UpdateFeatureForApplicationOnFeatureRes, error)
+	UpdateFeatureForApplicationOnFeature(ctx context.Context, request *Feature, params UpdateFeatureForApplicationOnFeatureParams) (UpdateFeatureForApplicationOnFeatureRes, error)
 	// UpdateFeatureForEnvironment invokes updateFeatureForEnvironment operation.
 	//
 	// Update a specific feature in this environment.
 	//
 	// PUT /mr-api/features/{eid}/feature/{key}
-	UpdateFeatureForEnvironment(ctx context.Context, request FeatureValue, params UpdateFeatureForEnvironmentParams) (UpdateFeatureForEnvironmentRes, error)
+	UpdateFeatureForEnvironment(ctx context.Context, request *FeatureValue, params UpdateFeatureForEnvironmentParams) (UpdateFeatureForEnvironmentRes, error)
 	// UpdateFeatureGroup invokes updateFeatureGroup operation.
 	//
 	// Get feature groups for this application.
@@ -610,14 +639,14 @@ type Invoker interface {
 	// Deprecated: schema marks this operation as deprecated.
 	//
 	// PUT /mr-api/service-account/{id}
-	UpdateServiceAccount(ctx context.Context, request ServiceAccount, params UpdateServiceAccountParams) (UpdateServiceAccountRes, error)
+	UpdateServiceAccount(ctx context.Context, request *ServiceAccount, params UpdateServiceAccountParams) (UpdateServiceAccountRes, error)
 	// UpdateServiceAccountOnPortfolio invokes updateServiceAccountOnPortfolio operation.
 	//
 	// Update this service account, overwiting any attached environment permissions this user has access
 	// to.
 	//
 	// PUT /mr-api/portfolio/{id}/service-account
-	UpdateServiceAccountOnPortfolio(ctx context.Context, request ServiceAccount, params UpdateServiceAccountOnPortfolioParams) (UpdateServiceAccountOnPortfolioRes, error)
+	UpdateServiceAccountOnPortfolio(ctx context.Context, request *ServiceAccount, params UpdateServiceAccountOnPortfolioParams) (UpdateServiceAccountOnPortfolioRes, error)
 	// Validate invokes validate operation.
 	//
 	// Provide server validation responses for this group of rollout strategies.
@@ -1073,12 +1102,12 @@ func (c *Client) sendCacheRefresh(ctx context.Context, request *CacheRefreshRequ
 // Change password.
 //
 // PUT /mr-api/authentication/{id}/changePassword
-func (c *Client) ChangePassword(ctx context.Context, request PasswordUpdate, params ChangePasswordParams) (ChangePasswordRes, error) {
+func (c *Client) ChangePassword(ctx context.Context, request *PasswordUpdate, params ChangePasswordParams) (ChangePasswordRes, error) {
 	res, err := c.sendChangePassword(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendChangePassword(ctx context.Context, request PasswordUpdate, params ChangePasswordParams) (res ChangePasswordRes, err error) {
+func (c *Client) sendChangePassword(ctx context.Context, request *PasswordUpdate, params ChangePasswordParams) (res ChangePasswordRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("changePassword"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -1790,17 +1819,144 @@ func (c *Client) sendCreateEnvironmentOnApplication(ctx context.Context, request
 	return result, nil
 }
 
+// CreateFeatureFilter invokes createFeatureFilter operation.
+//
+// POST /mr-api/portfolio/{id}/feature-filter
+func (c *Client) CreateFeatureFilter(ctx context.Context, request *CreateFeatureFilter, params CreateFeatureFilterParams) (CreateFeatureFilterRes, error) {
+	res, err := c.sendCreateFeatureFilter(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendCreateFeatureFilter(ctx context.Context, request *CreateFeatureFilter, params CreateFeatureFilterParams) (res CreateFeatureFilterRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("createFeatureFilter"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.URLTemplateKey.String("/mr-api/portfolio/{id}/feature-filter"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateFeatureFilterOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/mr-api/portfolio/"
+	{
+		// Encode "id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.ID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/feature-filter"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateFeatureFilterRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, CreateFeatureFilterOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateFeatureFilterResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // CreateFeatureForEnvironment invokes createFeatureForEnvironment operation.
 //
 // Create a specific feature in this environment.
 //
 // POST /mr-api/features/{eid}/feature/{key}
-func (c *Client) CreateFeatureForEnvironment(ctx context.Context, request FeatureValue, params CreateFeatureForEnvironmentParams) (CreateFeatureForEnvironmentRes, error) {
+func (c *Client) CreateFeatureForEnvironment(ctx context.Context, request *FeatureValue, params CreateFeatureForEnvironmentParams) (CreateFeatureForEnvironmentRes, error) {
 	res, err := c.sendCreateFeatureForEnvironment(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendCreateFeatureForEnvironment(ctx context.Context, request FeatureValue, params CreateFeatureForEnvironmentParams) (res CreateFeatureForEnvironmentRes, err error) {
+func (c *Client) sendCreateFeatureForEnvironment(ctx context.Context, request *FeatureValue, params CreateFeatureForEnvironmentParams) (res CreateFeatureForEnvironmentRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createFeatureForEnvironment"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -2071,12 +2227,12 @@ func (c *Client) sendCreateFeatureGroup(ctx context.Context, request *FeatureGro
 // Add a new feature to this application, returns all features.
 //
 // POST /mr-api/application/{id}/features
-func (c *Client) CreateFeaturesForApplication(ctx context.Context, request CreateFeature, params CreateFeaturesForApplicationParams) (CreateFeaturesForApplicationRes, error) {
+func (c *Client) CreateFeaturesForApplication(ctx context.Context, request *CreateFeature, params CreateFeaturesForApplicationParams) (CreateFeaturesForApplicationRes, error) {
 	res, err := c.sendCreateFeaturesForApplication(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendCreateFeaturesForApplication(ctx context.Context, request CreateFeature, params CreateFeaturesForApplicationParams) (res CreateFeaturesForApplicationRes, err error) {
+func (c *Client) sendCreateFeaturesForApplication(ctx context.Context, request *CreateFeature, params CreateFeaturesForApplicationParams) (res CreateFeaturesForApplicationRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createFeaturesForApplication"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -2481,12 +2637,12 @@ func (c *Client) sendCreateOrUpdateSystemConfigs(ctx context.Context, request *U
 // Create a new person.
 //
 // POST /mr-api/person
-func (c *Client) CreatePerson(ctx context.Context, request CreatePersonDetails, params CreatePersonParams) (CreatePersonRes, error) {
+func (c *Client) CreatePerson(ctx context.Context, request *CreatePersonDetails, params CreatePersonParams) (CreatePersonRes, error) {
 	res, err := c.sendCreatePerson(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendCreatePerson(ctx context.Context, request CreatePersonDetails, params CreatePersonParams) (res CreatePersonRes, err error) {
+func (c *Client) sendCreatePerson(ctx context.Context, request *CreatePersonDetails, params CreatePersonParams) (res CreatePersonRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createPerson"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -2760,12 +2916,12 @@ func (c *Client) sendCreatePortfolio(ctx context.Context, request *CreatePortfol
 // Add a new service account.
 //
 // POST /mr-api/portfolio/{id}/service-account
-func (c *Client) CreateServiceAccountInPortfolio(ctx context.Context, request CreateServiceAccount, params CreateServiceAccountInPortfolioParams) (CreateServiceAccountInPortfolioRes, error) {
+func (c *Client) CreateServiceAccountInPortfolio(ctx context.Context, request *CreateServiceAccount, params CreateServiceAccountInPortfolioParams) (CreateServiceAccountInPortfolioRes, error) {
 	res, err := c.sendCreateServiceAccountInPortfolio(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendCreateServiceAccountInPortfolio(ctx context.Context, request CreateServiceAccount, params CreateServiceAccountInPortfolioParams) (res CreateServiceAccountInPortfolioRes, err error) {
+func (c *Client) sendCreateServiceAccountInPortfolio(ctx context.Context, request *CreateServiceAccount, params CreateServiceAccountInPortfolioParams) (res CreateServiceAccountInPortfolioRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createServiceAccountInPortfolio"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -3559,6 +3715,169 @@ func (c *Client) sendDeleteEnvironment(ctx context.Context, params DeleteEnviron
 	return result, nil
 }
 
+// DeleteFeatureFilter invokes deleteFeatureFilter operation.
+//
+// Delete the filter, it must have the same ID and version as the existing one to be successfully
+// deleted.
+//
+// DELETE /mr-api/portfolio/{id}/feature-filter/{filterId}
+func (c *Client) DeleteFeatureFilter(ctx context.Context, params DeleteFeatureFilterParams) (DeleteFeatureFilterRes, error) {
+	res, err := c.sendDeleteFeatureFilter(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendDeleteFeatureFilter(ctx context.Context, params DeleteFeatureFilterParams) (res DeleteFeatureFilterRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("deleteFeatureFilter"),
+		semconv.HTTPRequestMethodKey.String("DELETE"),
+		semconv.URLTemplateKey.String("/mr-api/portfolio/{id}/feature-filter/{filterId}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, DeleteFeatureFilterOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/mr-api/portfolio/"
+	{
+		// Encode "id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.ID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/feature-filter/"
+	{
+		// Encode "filterId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "filterId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.FilterId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "version" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "version",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.IntToString(params.Version))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, DeleteFeatureFilterOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeDeleteFeatureFilterResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // DeleteFeatureForApplication invokes deleteFeatureForApplication operation.
 //
 // Updates all named features in this application, returns all features.
@@ -3659,6 +3978,23 @@ func (c *Client) sendDeleteFeatureForApplication(ctx context.Context, params Del
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.IncludeMetaData.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "includeFilters" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "includeFilters",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IncludeFilters.Get(); ok {
 				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
@@ -5130,6 +5466,32 @@ func (c *Client) sendFindAllFeatureAndFeatureValuesForEnvironmentsByApplication(
 			return res, errors.Wrap(err, "encode query")
 		}
 	}
+	{
+		// Encode "featureFilter" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "featureFilter",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.FeatureFilter != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.FeatureFilter {
+						if err := func() error {
+							return e.EncodeValue(conv.UUIDToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
@@ -5594,6 +5956,221 @@ func (c *Client) sendFindEnvironments(ctx context.Context, params FindEnvironmen
 
 	stage = "DecodeResponse"
 	result, err := decodeFindEnvironmentsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// FindFeatureFilters invokes findFeatureFilters operation.
+//
+// Gets all of the feature filters listed in this portfolio with appropriate filtering.
+//
+// GET /mr-api/portfolio/{id}/feature-filter
+func (c *Client) FindFeatureFilters(ctx context.Context, params FindFeatureFiltersParams) (FindFeatureFiltersRes, error) {
+	res, err := c.sendFindFeatureFilters(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendFindFeatureFilters(ctx context.Context, params FindFeatureFiltersParams) (res FindFeatureFiltersRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("findFeatureFilters"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/mr-api/portfolio/{id}/feature-filter"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, FindFeatureFiltersOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/mr-api/portfolio/"
+	{
+		// Encode "id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.ID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/feature-filter"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "filter" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "filter",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Filter.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "max" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "max",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Max.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "page" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "page",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Page.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "sortOrder" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "sortOrder",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.SortOrder.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "includeDetails" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "includeDetails",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IncludeDetails.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, FindFeatureFiltersOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeFindFeatureFiltersResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -7223,6 +7800,23 @@ func (c *Client) sendGetFeatureByKey(ctx context.Context, params GetFeatureByKey
 			return res, errors.Wrap(err, "encode query")
 		}
 	}
+	{
+		// Encode "includeFilters" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "includeFilters",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IncludeFilters.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
@@ -7274,6 +7868,148 @@ func (c *Client) sendGetFeatureByKey(ctx context.Context, params GetFeatureByKey
 
 	stage = "DecodeResponse"
 	result, err := decodeGetFeatureByKeyResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetFeatureFilter invokes getFeatureFilter operation.
+//
+// GET /mr-api/portfolio/{id}/feature-filter/{filterId}
+func (c *Client) GetFeatureFilter(ctx context.Context, params GetFeatureFilterParams) (GetFeatureFilterRes, error) {
+	res, err := c.sendGetFeatureFilter(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetFeatureFilter(ctx context.Context, params GetFeatureFilterParams) (res GetFeatureFilterRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("getFeatureFilter"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/mr-api/portfolio/{id}/feature-filter/{filterId}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, GetFeatureFilterOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/mr-api/portfolio/"
+	{
+		// Encode "id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.ID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/feature-filter/"
+	{
+		// Encode "filterId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "filterId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.FilterId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, GetFeatureFilterOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeGetFeatureFilterResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -8348,6 +9084,175 @@ func (c *Client) sendGetLoginUrlForProvider(ctx context.Context, params GetLogin
 	return result, nil
 }
 
+// GetMatchingFilters invokes getMatchingFilters operation.
+//
+// GET /mr-api/portfolio/{id}/feature-filter/matching/{matchType}
+func (c *Client) GetMatchingFilters(ctx context.Context, params GetMatchingFiltersParams) (GetMatchingFiltersRes, error) {
+	res, err := c.sendGetMatchingFilters(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetMatchingFilters(ctx context.Context, params GetMatchingFiltersParams) (res GetMatchingFiltersRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("getMatchingFilters"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/mr-api/portfolio/{id}/feature-filter/matching/{matchType}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, GetMatchingFiltersOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/mr-api/portfolio/"
+	{
+		// Encode "id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.ID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/feature-filter/matching/"
+	{
+		// Encode "matchType" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "matchType",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(string(params.MatchType)))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "filters" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "filters",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeArray(func(e uri.Encoder) error {
+				for i, item := range params.Filters {
+					if err := func() error {
+						return e.EncodeValue(conv.UUIDToString(item))
+					}(); err != nil {
+						return errors.Wrapf(err, "[%d]", i)
+					}
+				}
+				return nil
+			})
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, GetMatchingFiltersOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeGetMatchingFiltersResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // GetPerson invokes getPerson operation.
 //
 // Get person.
@@ -8772,6 +9677,23 @@ func (c *Client) sendGetServiceAccount(ctx context.Context, params GetServiceAcc
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.IncludePermissions.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "includeFilters" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "includeFilters",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IncludeFilters.Get(); ok {
 				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
@@ -10545,12 +11467,12 @@ func (c *Client) sendListWebhooks(ctx context.Context, params ListWebhooksParams
 // Login to Feature Hub.
 //
 // POST /mr-api/login
-func (c *Client) Login(ctx context.Context, request UserCredentials) (LoginRes, error) {
+func (c *Client) Login(ctx context.Context, request *UserCredentials) (LoginRes, error) {
 	res, err := c.sendLogin(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendLogin(ctx context.Context, request UserCredentials) (res LoginRes, err error) {
+func (c *Client) sendLogin(ctx context.Context, request *UserCredentials) (res LoginRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("login"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -10821,12 +11743,12 @@ func (c *Client) sendPersonByToken(ctx context.Context, params PersonByTokenPara
 // Create a new user.
 //
 // POST /mr-api/authentication
-func (c *Client) RegisterPerson(ctx context.Context, request PersonRegistrationDetails) (RegisterPersonRes, error) {
+func (c *Client) RegisterPerson(ctx context.Context, request *PersonRegistrationDetails) (RegisterPersonRes, error) {
 	res, err := c.sendRegisterPerson(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendRegisterPerson(ctx context.Context, request PersonRegistrationDetails) (res RegisterPersonRes, err error) {
+func (c *Client) sendRegisterPerson(ctx context.Context, request *PersonRegistrationDetails) (res RegisterPersonRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("registerPerson"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -10898,12 +11820,12 @@ func (c *Client) sendRegisterPerson(ctx context.Context, request PersonRegistrat
 // Replace temporary password.
 //
 // PUT /mr-api/authentication/{id}/replaceTempPassword
-func (c *Client) ReplaceTempPassword(ctx context.Context, request PasswordReset, params ReplaceTempPasswordParams) (ReplaceTempPasswordRes, error) {
+func (c *Client) ReplaceTempPassword(ctx context.Context, request *PasswordReset, params ReplaceTempPasswordParams) (ReplaceTempPasswordRes, error) {
 	res, err := c.sendReplaceTempPassword(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendReplaceTempPassword(ctx context.Context, request PasswordReset, params ReplaceTempPasswordParams) (res ReplaceTempPasswordRes, err error) {
+func (c *Client) sendReplaceTempPassword(ctx context.Context, request *PasswordReset, params ReplaceTempPasswordParams) (res ReplaceTempPasswordRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("replaceTempPassword"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -11300,12 +12222,12 @@ func (c *Client) sendResetExpiredToken(ctx context.Context, params ResetExpiredT
 // Reset password.
 //
 // PUT /mr-api/authentication/{id}/resetPassword
-func (c *Client) ResetPassword(ctx context.Context, request PasswordReset, params ResetPasswordParams) (ResetPasswordRes, error) {
+func (c *Client) ResetPassword(ctx context.Context, request *PasswordReset, params ResetPasswordParams) (ResetPasswordRes, error) {
 	res, err := c.sendResetPassword(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendResetPassword(ctx context.Context, request PasswordReset, params ResetPasswordParams) (res ResetPasswordRes, err error) {
+func (c *Client) sendResetPassword(ctx context.Context, request *PasswordReset, params ResetPasswordParams) (res ResetPasswordRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("resetPassword"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -13509,18 +14431,145 @@ func (c *Client) sendUpdateEnvironmentV2(ctx context.Context, request *UpdateEnv
 	return result, nil
 }
 
+// UpdateFeatureFilter invokes updateFeatureFilter operation.
+//
+// PUT /mr-api/portfolio/{id}/feature-filter
+func (c *Client) UpdateFeatureFilter(ctx context.Context, request *FeatureFilter, params UpdateFeatureFilterParams) (UpdateFeatureFilterRes, error) {
+	res, err := c.sendUpdateFeatureFilter(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUpdateFeatureFilter(ctx context.Context, request *FeatureFilter, params UpdateFeatureFilterParams) (res UpdateFeatureFilterRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("updateFeatureFilter"),
+		semconv.HTTPRequestMethodKey.String("PUT"),
+		semconv.URLTemplateKey.String("/mr-api/portfolio/{id}/feature-filter"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateFeatureFilterOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/mr-api/portfolio/"
+	{
+		// Encode "id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.ID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/feature-filter"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PUT", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdateFeatureFilterRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, UpdateFeatureFilterOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdateFeatureFilterResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // UpdateFeatureForApplication invokes updateFeatureForApplication operation.
 //
 // Updates all named features in this application, returns all features. Use this ONLY if you wish to
 // change the key.
 //
 // PUT /mr-api/application/{id}/features/{key}
-func (c *Client) UpdateFeatureForApplication(ctx context.Context, request Feature, params UpdateFeatureForApplicationParams) (UpdateFeatureForApplicationRes, error) {
+func (c *Client) UpdateFeatureForApplication(ctx context.Context, request *Feature, params UpdateFeatureForApplicationParams) (UpdateFeatureForApplicationRes, error) {
 	res, err := c.sendUpdateFeatureForApplication(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateFeatureForApplication(ctx context.Context, request Feature, params UpdateFeatureForApplicationParams) (res UpdateFeatureForApplicationRes, err error) {
+func (c *Client) sendUpdateFeatureForApplication(ctx context.Context, request *Feature, params UpdateFeatureForApplicationParams) (res UpdateFeatureForApplicationRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateFeatureForApplication"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -13617,6 +14666,23 @@ func (c *Client) sendUpdateFeatureForApplication(ctx context.Context, request Fe
 			return res, errors.Wrap(err, "encode query")
 		}
 	}
+	{
+		// Encode "includeFilters" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "includeFilters",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IncludeFilters.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
@@ -13684,12 +14750,12 @@ func (c *Client) sendUpdateFeatureForApplication(ctx context.Context, request Fe
 // feature updated.
 //
 // PUT /mr-api/application/{id}/features
-func (c *Client) UpdateFeatureForApplicationOnFeature(ctx context.Context, request Feature, params UpdateFeatureForApplicationOnFeatureParams) (UpdateFeatureForApplicationOnFeatureRes, error) {
+func (c *Client) UpdateFeatureForApplicationOnFeature(ctx context.Context, request *Feature, params UpdateFeatureForApplicationOnFeatureParams) (UpdateFeatureForApplicationOnFeatureRes, error) {
 	res, err := c.sendUpdateFeatureForApplicationOnFeature(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateFeatureForApplicationOnFeature(ctx context.Context, request Feature, params UpdateFeatureForApplicationOnFeatureParams) (res UpdateFeatureForApplicationOnFeatureRes, err error) {
+func (c *Client) sendUpdateFeatureForApplicationOnFeature(ctx context.Context, request *Feature, params UpdateFeatureForApplicationOnFeatureParams) (res UpdateFeatureForApplicationOnFeatureRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateFeatureForApplicationOnFeature"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -13851,12 +14917,12 @@ func (c *Client) sendUpdateFeatureForApplicationOnFeature(ctx context.Context, r
 // Update a specific feature in this environment.
 //
 // PUT /mr-api/features/{eid}/feature/{key}
-func (c *Client) UpdateFeatureForEnvironment(ctx context.Context, request FeatureValue, params UpdateFeatureForEnvironmentParams) (UpdateFeatureForEnvironmentRes, error) {
+func (c *Client) UpdateFeatureForEnvironment(ctx context.Context, request *FeatureValue, params UpdateFeatureForEnvironmentParams) (UpdateFeatureForEnvironmentRes, error) {
 	res, err := c.sendUpdateFeatureForEnvironment(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateFeatureForEnvironment(ctx context.Context, request FeatureValue, params UpdateFeatureForEnvironmentParams) (res UpdateFeatureForEnvironmentRes, err error) {
+func (c *Client) sendUpdateFeatureForEnvironment(ctx context.Context, request *FeatureValue, params UpdateFeatureForEnvironmentParams) (res UpdateFeatureForEnvironmentRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateFeatureForEnvironment"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -15263,12 +16329,12 @@ func (c *Client) sendUpdatePortfolioOnOrganisation(ctx context.Context, request 
 // Deprecated: schema marks this operation as deprecated.
 //
 // PUT /mr-api/service-account/{id}
-func (c *Client) UpdateServiceAccount(ctx context.Context, request ServiceAccount, params UpdateServiceAccountParams) (UpdateServiceAccountRes, error) {
+func (c *Client) UpdateServiceAccount(ctx context.Context, request *ServiceAccount, params UpdateServiceAccountParams) (UpdateServiceAccountRes, error) {
 	res, err := c.sendUpdateServiceAccount(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateServiceAccount(ctx context.Context, request ServiceAccount, params UpdateServiceAccountParams) (res UpdateServiceAccountRes, err error) {
+func (c *Client) sendUpdateServiceAccount(ctx context.Context, request *ServiceAccount, params UpdateServiceAccountParams) (res UpdateServiceAccountRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateServiceAccount"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -15413,12 +16479,12 @@ func (c *Client) sendUpdateServiceAccount(ctx context.Context, request ServiceAc
 // to.
 //
 // PUT /mr-api/portfolio/{id}/service-account
-func (c *Client) UpdateServiceAccountOnPortfolio(ctx context.Context, request ServiceAccount, params UpdateServiceAccountOnPortfolioParams) (UpdateServiceAccountOnPortfolioRes, error) {
+func (c *Client) UpdateServiceAccountOnPortfolio(ctx context.Context, request *ServiceAccount, params UpdateServiceAccountOnPortfolioParams) (UpdateServiceAccountOnPortfolioRes, error) {
 	res, err := c.sendUpdateServiceAccountOnPortfolio(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateServiceAccountOnPortfolio(ctx context.Context, request ServiceAccount, params UpdateServiceAccountOnPortfolioParams) (res UpdateServiceAccountOnPortfolioRes, err error) {
+func (c *Client) sendUpdateServiceAccountOnPortfolio(ctx context.Context, request *ServiceAccount, params UpdateServiceAccountOnPortfolioParams) (res UpdateServiceAccountOnPortfolioRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateServiceAccountOnPortfolio"),
 		semconv.HTTPRequestMethodKey.String("PUT"),

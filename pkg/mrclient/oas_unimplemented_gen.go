@@ -45,7 +45,7 @@ func (UnimplementedHandler) CacheRefresh(ctx context.Context, req *CacheRefreshR
 // Change password.
 //
 // PUT /mr-api/authentication/{id}/changePassword
-func (UnimplementedHandler) ChangePassword(ctx context.Context, req PasswordUpdate, params ChangePasswordParams) (r ChangePasswordRes, _ error) {
+func (UnimplementedHandler) ChangePassword(ctx context.Context, req *PasswordUpdate, params ChangePasswordParams) (r ChangePasswordRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -86,12 +86,19 @@ func (UnimplementedHandler) CreateEnvironmentOnApplication(ctx context.Context, 
 	return r, ht.ErrNotImplemented
 }
 
+// CreateFeatureFilter implements createFeatureFilter operation.
+//
+// POST /mr-api/portfolio/{id}/feature-filter
+func (UnimplementedHandler) CreateFeatureFilter(ctx context.Context, req *CreateFeatureFilter, params CreateFeatureFilterParams) (r CreateFeatureFilterRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // CreateFeatureForEnvironment implements createFeatureForEnvironment operation.
 //
 // Create a specific feature in this environment.
 //
 // POST /mr-api/features/{eid}/feature/{key}
-func (UnimplementedHandler) CreateFeatureForEnvironment(ctx context.Context, req FeatureValue, params CreateFeatureForEnvironmentParams) (r CreateFeatureForEnvironmentRes, _ error) {
+func (UnimplementedHandler) CreateFeatureForEnvironment(ctx context.Context, req *FeatureValue, params CreateFeatureForEnvironmentParams) (r CreateFeatureForEnvironmentRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -109,7 +116,7 @@ func (UnimplementedHandler) CreateFeatureGroup(ctx context.Context, req *Feature
 // Add a new feature to this application, returns all features.
 //
 // POST /mr-api/application/{id}/features
-func (UnimplementedHandler) CreateFeaturesForApplication(ctx context.Context, req CreateFeature, params CreateFeaturesForApplicationParams) (r CreateFeaturesForApplicationRes, _ error) {
+func (UnimplementedHandler) CreateFeaturesForApplication(ctx context.Context, req *CreateFeature, params CreateFeaturesForApplicationParams) (r CreateFeaturesForApplicationRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -136,7 +143,7 @@ func (UnimplementedHandler) CreateOrUpdateSystemConfigs(ctx context.Context, req
 // Create a new person.
 //
 // POST /mr-api/person
-func (UnimplementedHandler) CreatePerson(ctx context.Context, req CreatePersonDetails, params CreatePersonParams) (r CreatePersonRes, _ error) {
+func (UnimplementedHandler) CreatePerson(ctx context.Context, req *CreatePersonDetails, params CreatePersonParams) (r CreatePersonRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -154,7 +161,7 @@ func (UnimplementedHandler) CreatePortfolio(ctx context.Context, req *CreatePort
 // Add a new service account.
 //
 // POST /mr-api/portfolio/{id}/service-account
-func (UnimplementedHandler) CreateServiceAccountInPortfolio(ctx context.Context, req CreateServiceAccount, params CreateServiceAccountInPortfolioParams) (r CreateServiceAccountInPortfolioRes, _ error) {
+func (UnimplementedHandler) CreateServiceAccountInPortfolio(ctx context.Context, req *CreateServiceAccount, params CreateServiceAccountInPortfolioParams) (r CreateServiceAccountInPortfolioRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -190,6 +197,16 @@ func (UnimplementedHandler) DeleteApplicationStrategy(ctx context.Context, param
 //
 // DELETE /mr-api/environment/{eid}
 func (UnimplementedHandler) DeleteEnvironment(ctx context.Context, params DeleteEnvironmentParams) (r DeleteEnvironmentRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// DeleteFeatureFilter implements deleteFeatureFilter operation.
+//
+// Delete the filter, it must have the same ID and version as the existing one to be successfully
+// deleted.
+//
+// DELETE /mr-api/portfolio/{id}/feature-filter/{filterId}
+func (UnimplementedHandler) DeleteFeatureFilter(ctx context.Context, params DeleteFeatureFilterParams) (r DeleteFeatureFilterRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -302,6 +319,15 @@ func (UnimplementedHandler) FindEnvironments(ctx context.Context, params FindEnv
 	return r, ht.ErrNotImplemented
 }
 
+// FindFeatureFilters implements findFeatureFilters operation.
+//
+// Gets all of the feature filters listed in this portfolio with appropriate filtering.
+//
+// GET /mr-api/portfolio/{id}/feature-filter
+func (UnimplementedHandler) FindFeatureFilters(ctx context.Context, params FindFeatureFiltersParams) (r FindFeatureFiltersRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // FindGroups implements findGroups operation.
 //
 // Gets a list of groups.
@@ -381,6 +407,13 @@ func (UnimplementedHandler) GetFeatureByKey(ctx context.Context, params GetFeatu
 	return r, ht.ErrNotImplemented
 }
 
+// GetFeatureFilter implements getFeatureFilter operation.
+//
+// GET /mr-api/portfolio/{id}/feature-filter/{filterId}
+func (UnimplementedHandler) GetFeatureFilter(ctx context.Context, params GetFeatureFilterParams) (r GetFeatureFilterRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetFeatureForEnvironment implements getFeatureForEnvironment operation.
 //
 // Update a specific feature in this environment.
@@ -450,6 +483,13 @@ func (UnimplementedHandler) GetInfoVersion(ctx context.Context) (r *ApplicationV
 //
 // GET /mr-api/external-provider/{provider}
 func (UnimplementedHandler) GetLoginUrlForProvider(ctx context.Context, params GetLoginUrlForProviderParams) (r GetLoginUrlForProviderRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetMatchingFilters implements getMatchingFilters operation.
+//
+// GET /mr-api/portfolio/{id}/feature-filter/matching/{matchType}
+func (UnimplementedHandler) GetMatchingFilters(ctx context.Context, params GetMatchingFiltersParams) (r GetMatchingFiltersRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -575,7 +615,7 @@ func (UnimplementedHandler) ListWebhooks(ctx context.Context, params ListWebhook
 // Login to Feature Hub.
 //
 // POST /mr-api/login
-func (UnimplementedHandler) Login(ctx context.Context, req UserCredentials) (r LoginRes, _ error) {
+func (UnimplementedHandler) Login(ctx context.Context, req *UserCredentials) (r LoginRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -602,7 +642,7 @@ func (UnimplementedHandler) PersonByToken(ctx context.Context, params PersonByTo
 // Create a new user.
 //
 // POST /mr-api/authentication
-func (UnimplementedHandler) RegisterPerson(ctx context.Context, req PersonRegistrationDetails) (r RegisterPersonRes, _ error) {
+func (UnimplementedHandler) RegisterPerson(ctx context.Context, req *PersonRegistrationDetails) (r RegisterPersonRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -611,7 +651,7 @@ func (UnimplementedHandler) RegisterPerson(ctx context.Context, req PersonRegist
 // Replace temporary password.
 //
 // PUT /mr-api/authentication/{id}/replaceTempPassword
-func (UnimplementedHandler) ReplaceTempPassword(ctx context.Context, req PasswordReset, params ReplaceTempPasswordParams) (r ReplaceTempPasswordRes, _ error) {
+func (UnimplementedHandler) ReplaceTempPassword(ctx context.Context, req *PasswordReset, params ReplaceTempPasswordParams) (r ReplaceTempPasswordRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -638,7 +678,7 @@ func (UnimplementedHandler) ResetExpiredToken(ctx context.Context, params ResetE
 // Reset password.
 //
 // PUT /mr-api/authentication/{id}/resetPassword
-func (UnimplementedHandler) ResetPassword(ctx context.Context, req PasswordReset, params ResetPasswordParams) (r ResetPasswordRes, _ error) {
+func (UnimplementedHandler) ResetPassword(ctx context.Context, req *PasswordReset, params ResetPasswordParams) (r ResetPasswordRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -773,13 +813,20 @@ func (UnimplementedHandler) UpdateEnvironmentV2(ctx context.Context, req *Update
 	return r, ht.ErrNotImplemented
 }
 
+// UpdateFeatureFilter implements updateFeatureFilter operation.
+//
+// PUT /mr-api/portfolio/{id}/feature-filter
+func (UnimplementedHandler) UpdateFeatureFilter(ctx context.Context, req *FeatureFilter, params UpdateFeatureFilterParams) (r UpdateFeatureFilterRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // UpdateFeatureForApplication implements updateFeatureForApplication operation.
 //
 // Updates all named features in this application, returns all features. Use this ONLY if you wish to
 // change the key.
 //
 // PUT /mr-api/application/{id}/features/{key}
-func (UnimplementedHandler) UpdateFeatureForApplication(ctx context.Context, req Feature, params UpdateFeatureForApplicationParams) (r UpdateFeatureForApplicationRes, _ error) {
+func (UnimplementedHandler) UpdateFeatureForApplication(ctx context.Context, req *Feature, params UpdateFeatureForApplicationParams) (r UpdateFeatureForApplicationRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -789,7 +836,7 @@ func (UnimplementedHandler) UpdateFeatureForApplication(ctx context.Context, req
 // feature updated.
 //
 // PUT /mr-api/application/{id}/features
-func (UnimplementedHandler) UpdateFeatureForApplicationOnFeature(ctx context.Context, req Feature, params UpdateFeatureForApplicationOnFeatureParams) (r UpdateFeatureForApplicationOnFeatureRes, _ error) {
+func (UnimplementedHandler) UpdateFeatureForApplicationOnFeature(ctx context.Context, req *Feature, params UpdateFeatureForApplicationOnFeatureParams) (r UpdateFeatureForApplicationOnFeatureRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -798,7 +845,7 @@ func (UnimplementedHandler) UpdateFeatureForApplicationOnFeature(ctx context.Con
 // Update a specific feature in this environment.
 //
 // PUT /mr-api/features/{eid}/feature/{key}
-func (UnimplementedHandler) UpdateFeatureForEnvironment(ctx context.Context, req FeatureValue, params UpdateFeatureForEnvironmentParams) (r UpdateFeatureForEnvironmentRes, _ error) {
+func (UnimplementedHandler) UpdateFeatureForEnvironment(ctx context.Context, req *FeatureValue, params UpdateFeatureForEnvironmentParams) (r UpdateFeatureForEnvironmentRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -877,7 +924,7 @@ func (UnimplementedHandler) UpdatePortfolioOnOrganisation(ctx context.Context, r
 // Deprecated: schema marks this operation as deprecated.
 //
 // PUT /mr-api/service-account/{id}
-func (UnimplementedHandler) UpdateServiceAccount(ctx context.Context, req ServiceAccount, params UpdateServiceAccountParams) (r UpdateServiceAccountRes, _ error) {
+func (UnimplementedHandler) UpdateServiceAccount(ctx context.Context, req *ServiceAccount, params UpdateServiceAccountParams) (r UpdateServiceAccountRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -887,7 +934,7 @@ func (UnimplementedHandler) UpdateServiceAccount(ctx context.Context, req Servic
 // to.
 //
 // PUT /mr-api/portfolio/{id}/service-account
-func (UnimplementedHandler) UpdateServiceAccountOnPortfolio(ctx context.Context, req ServiceAccount, params UpdateServiceAccountOnPortfolioParams) (r UpdateServiceAccountOnPortfolioRes, _ error) {
+func (UnimplementedHandler) UpdateServiceAccountOnPortfolio(ctx context.Context, req *ServiceAccount, params UpdateServiceAccountOnPortfolioParams) (r UpdateServiceAccountOnPortfolioRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

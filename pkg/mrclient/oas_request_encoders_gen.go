@@ -25,7 +25,7 @@ func encodeCacheRefreshRequest(
 }
 
 func encodeChangePasswordRequest(
-	req PasswordUpdate,
+	req *PasswordUpdate,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -94,8 +94,22 @@ func encodeCreateEnvironmentOnApplicationRequest(
 	return nil
 }
 
+func encodeCreateFeatureFilterRequest(
+	req *CreateFeatureFilter,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodeCreateFeatureForEnvironmentRequest(
-	req FeatureValue,
+	req *FeatureValue,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -123,7 +137,7 @@ func encodeCreateFeatureGroupRequest(
 }
 
 func encodeCreateFeaturesForApplicationRequest(
-	req CreateFeature,
+	req *CreateFeature,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -165,7 +179,7 @@ func encodeCreateOrUpdateSystemConfigsRequest(
 }
 
 func encodeCreatePersonRequest(
-	req CreatePersonDetails,
+	req *CreatePersonDetails,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -193,7 +207,7 @@ func encodeCreatePortfolioRequest(
 }
 
 func encodeCreateServiceAccountInPortfolioRequest(
-	req CreateServiceAccount,
+	req *CreateServiceAccount,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -225,7 +239,7 @@ func encodeEnvironmentOrderingRequest(
 }
 
 func encodeLoginRequest(
-	req UserCredentials,
+	req *UserCredentials,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -239,7 +253,7 @@ func encodeLoginRequest(
 }
 
 func encodeRegisterPersonRequest(
-	req PersonRegistrationDetails,
+	req *PersonRegistrationDetails,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -253,7 +267,7 @@ func encodeRegisterPersonRequest(
 }
 
 func encodeReplaceTempPasswordRequest(
-	req PasswordReset,
+	req *PasswordReset,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -267,7 +281,7 @@ func encodeReplaceTempPasswordRequest(
 }
 
 func encodeResetPasswordRequest(
-	req PasswordReset,
+	req *PasswordReset,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -442,8 +456,22 @@ func encodeUpdateEnvironmentV2Request(
 	return nil
 }
 
+func encodeUpdateFeatureFilterRequest(
+	req *FeatureFilter,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodeUpdateFeatureForApplicationRequest(
-	req Feature,
+	req *Feature,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -457,7 +485,7 @@ func encodeUpdateFeatureForApplicationRequest(
 }
 
 func encodeUpdateFeatureForApplicationOnFeatureRequest(
-	req Feature,
+	req *Feature,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -471,7 +499,7 @@ func encodeUpdateFeatureForApplicationOnFeatureRequest(
 }
 
 func encodeUpdateFeatureForEnvironmentRequest(
-	req FeatureValue,
+	req *FeatureValue,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -583,7 +611,7 @@ func encodeUpdatePortfolioOnOrganisationRequest(
 }
 
 func encodeUpdateServiceAccountRequest(
-	req ServiceAccount,
+	req *ServiceAccount,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -597,7 +625,7 @@ func encodeUpdateServiceAccountRequest(
 }
 
 func encodeUpdateServiceAccountOnPortfolioRequest(
-	req ServiceAccount,
+	req *ServiceAccount,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

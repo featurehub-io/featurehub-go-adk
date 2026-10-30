@@ -357,6 +357,44 @@ func encodeCreateEnvironmentOnApplicationResponse(response CreateEnvironmentOnAp
 	}
 }
 
+func encodeCreateFeatureFilterResponse(response CreateFeatureFilterRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *FeatureFilter:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(201)
+		span.SetStatus(codes.Ok, http.StatusText(201))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CreateFeatureFilterBadRequest:
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		return nil
+
+	case *CreateFeatureFilterUnauthorized:
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		return nil
+
+	case *CreateFeatureFilterNotFound:
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeCreateFeatureForEnvironmentResponse(response CreateFeatureForEnvironmentRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *FeatureValue:
@@ -879,6 +917,50 @@ func encodeDeleteEnvironmentResponse(response DeleteEnvironmentRes, w http.Respo
 	}
 }
 
+func encodeDeleteFeatureFilterResponse(response DeleteFeatureFilterRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *FeatureFilter:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteFeatureFilterBadRequest:
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		return nil
+
+	case *DeleteFeatureFilterUnauthorized:
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		return nil
+
+	case *DeleteFeatureFilterNotFound:
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		return nil
+
+	case *DeleteFeatureFilterConflict:
+		w.WriteHeader(409)
+		span.SetStatus(codes.Error, http.StatusText(409))
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeDeleteFeatureForApplicationResponse(response DeleteFeatureForApplicationRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *DeleteFeatureForApplicationOKApplicationJSON:
@@ -1321,6 +1403,38 @@ func encodeFindEnvironmentsResponse(response FindEnvironmentsRes, w http.Respons
 	}
 }
 
+func encodeFindFeatureFiltersResponse(response FindFeatureFiltersRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *SearchFeatureFilterResult:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *FindFeatureFiltersBadRequest:
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		return nil
+
+	case *FindFeatureFiltersUnauthorized:
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeFindGroupsResponse(response FindGroupsRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *FindGroupsOKApplicationJSON:
@@ -1669,6 +1783,50 @@ func encodeGetFeatureByKeyResponse(response GetFeatureByKeyRes, w http.ResponseW
 	}
 }
 
+func encodeGetFeatureFilterResponse(response GetFeatureFilterRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *FeatureFilter:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetFeatureFilterBadRequest:
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		return nil
+
+	case *GetFeatureFilterUnauthorized:
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		return nil
+
+	case *GetFeatureFilterNotFound:
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		return nil
+
+	case *GetFeatureFilterConflict:
+		w.WriteHeader(409)
+		span.SetStatus(codes.Error, http.StatusText(409))
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeGetFeatureForEnvironmentResponse(response GetFeatureForEnvironmentRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *FeatureValue:
@@ -1947,6 +2105,38 @@ func encodeGetLoginUrlForProviderResponse(response GetLoginUrlForProviderRes, w 
 	case *GetLoginUrlForProviderNotFound:
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeGetMatchingFiltersResponse(response GetMatchingFiltersRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *MatchingFilterResults:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetMatchingFiltersBadRequest:
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		return nil
+
+	case *GetMatchingFiltersUnauthorized:
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
@@ -3398,6 +3588,50 @@ func encodeUpdateEnvironmentV2Response(response UpdateEnvironmentV2Res, w http.R
 	case *UpdateEnvironmentV2UnprocessableEntity:
 		w.WriteHeader(422)
 		span.SetStatus(codes.Error, http.StatusText(422))
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeUpdateFeatureFilterResponse(response UpdateFeatureFilterRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *FeatureFilter:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateFeatureFilterBadRequest:
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		return nil
+
+	case *UpdateFeatureFilterUnauthorized:
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		return nil
+
+	case *UpdateFeatureFilterNotFound:
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		return nil
+
+	case *UpdateFeatureFilterConflict:
+		w.WriteHeader(409)
+		span.SetStatus(codes.Error, http.StatusText(409))
 
 		return nil
 

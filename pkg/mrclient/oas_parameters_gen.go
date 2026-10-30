@@ -795,6 +795,72 @@ func decodeCreateEnvironmentOnApplicationParams(args [1]string, argsEscaped bool
 	return params, nil
 }
 
+// CreateFeatureFilterParams is parameters of createFeatureFilter operation.
+type CreateFeatureFilterParams struct {
+	// The portfolio this feature filter belongs to.
+	ID uuid.UUID
+}
+
+func unpackCreateFeatureFilterParams(packed middleware.Parameters) (params CreateFeatureFilterParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "id",
+			In:   "path",
+		}
+		params.ID = packed[key].(uuid.UUID)
+	}
+	return params
+}
+
+func decodeCreateFeatureFilterParams(args [1]string, argsEscaped bool, r *http.Request) (params CreateFeatureFilterParams, _ error) {
+	// Decode path: id.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToUUID(val)
+				if err != nil {
+					return err
+				}
+
+				params.ID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // CreateFeatureForEnvironmentParams is parameters of createFeatureForEnvironment operation.
 type CreateFeatureForEnvironmentParams struct {
 	// The id of the environment to find features.
@@ -2205,6 +2271,172 @@ func decodeDeleteEnvironmentParams(args [1]string, argsEscaped bool, r *http.Req
 	return params, nil
 }
 
+// DeleteFeatureFilterParams is parameters of deleteFeatureFilter operation.
+type DeleteFeatureFilterParams struct {
+	// The version of the feature you are trying to delete, must be passed, must be current.
+	Version int
+	// The portfolio this feature filter belongs to.
+	ID uuid.UUID
+	// The feature filter id.
+	FilterId uuid.UUID
+}
+
+func unpackDeleteFeatureFilterParams(packed middleware.Parameters) (params DeleteFeatureFilterParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "version",
+			In:   "query",
+		}
+		params.Version = packed[key].(int)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "id",
+			In:   "path",
+		}
+		params.ID = packed[key].(uuid.UUID)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "filterId",
+			In:   "path",
+		}
+		params.FilterId = packed[key].(uuid.UUID)
+	}
+	return params
+}
+
+func decodeDeleteFeatureFilterParams(args [2]string, argsEscaped bool, r *http.Request) (params DeleteFeatureFilterParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: version.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "version",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToInt(val)
+				if err != nil {
+					return err
+				}
+
+				params.Version = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "version",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode path: id.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToUUID(val)
+				if err != nil {
+					return err
+				}
+
+				params.ID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: filterId.
+	if err := func() error {
+		param := args[1]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[1])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "filterId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToUUID(val)
+				if err != nil {
+					return err
+				}
+
+				params.FilterId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "filterId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // DeleteFeatureForApplicationParams is parameters of deleteFeatureForApplication operation.
 type DeleteFeatureForApplicationParams struct {
 	// The id of the application to find.
@@ -2213,6 +2445,8 @@ type DeleteFeatureForApplicationParams struct {
 	Key string
 	// Include the metadata in the returned feature objects. Can be large.
 	IncludeMetaData OptBool `json:",omitempty,omitzero"`
+	// Include the filters associated with the flag.
+	IncludeFilters OptBool `json:",omitempty,omitzero"`
 }
 
 func unpackDeleteFeatureForApplicationParams(packed middleware.Parameters) (params DeleteFeatureForApplicationParams) {
@@ -2237,6 +2471,15 @@ func unpackDeleteFeatureForApplicationParams(packed middleware.Parameters) (para
 		}
 		if v, ok := packed[key]; ok {
 			params.IncludeMetaData = v.(OptBool)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "includeFilters",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.IncludeFilters = v.(OptBool)
 		}
 	}
 	return params
@@ -2371,6 +2614,47 @@ func decodeDeleteFeatureForApplicationParams(args [2]string, argsEscaped bool, r
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "includeMetaData",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: includeFilters.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "includeFilters",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotIncludeFiltersVal bool
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBool(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotIncludeFiltersVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.IncludeFilters.SetTo(paramsDotIncludeFiltersVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "includeFilters",
 			In:   "query",
 			Err:  err,
 		}
@@ -3502,7 +3786,9 @@ type FindAllFeatureAndFeatureValuesForEnvironmentsByApplicationParams struct {
 	// The page number of the results. 0 indexed.
 	Page         OptInt             `json:",omitempty,omitzero"`
 	FeatureTypes []FeatureValueType `json:",omitempty"`
-	SortOrder    OptSortOrder       `json:",omitempty,omitzero"`
+	SortOrder    OptNilSortOrder    `json:",omitempty,omitzero"`
+	// If specified, limit the feature list by those that have these filters associated.
+	FeatureFilter []uuid.UUID `json:",omitempty"`
 }
 
 func unpackFindAllFeatureAndFeatureValuesForEnvironmentsByApplicationParams(packed middleware.Parameters) (params FindAllFeatureAndFeatureValuesForEnvironmentsByApplicationParams) {
@@ -3564,7 +3850,16 @@ func unpackFindAllFeatureAndFeatureValuesForEnvironmentsByApplicationParams(pack
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.SortOrder = v.(OptSortOrder)
+			params.SortOrder = v.(OptNilSortOrder)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "featureFilter",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.FeatureFilter = v.([]uuid.UUID)
 		}
 	}
 	return params
@@ -3904,13 +4199,56 @@ func decodeFindAllFeatureAndFeatureValuesForEnvironmentsByApplicationParams(args
 			Err:  err,
 		}
 	}
+	// Decode query: featureFilter.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "featureFilter",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotFeatureFilterVal uuid.UUID
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToUUID(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotFeatureFilterVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.FeatureFilter = append(params.FeatureFilter, paramsDotFeatureFilterVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "featureFilter",
+			In:   "query",
+			Err:  err,
+		}
+	}
 	return params, nil
 }
 
 // FindApplicationsParams is parameters of findApplications operation.
 type FindApplicationsParams struct {
 	// How to order the results.
-	Order OptSortOrder `json:",omitempty,omitzero"`
+	Order OptNilSortOrder `json:",omitempty,omitzero"`
 	// What to filter the results by.
 	Filter OptString `json:",omitempty,omitzero"`
 	// The id of the portfolio to find.
@@ -3928,7 +4266,7 @@ func unpackFindApplicationsParams(packed middleware.Parameters) (params FindAppl
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Order = v.(OptSortOrder)
+			params.Order = v.(OptNilSortOrder)
 		}
 	}
 	{
@@ -4539,10 +4877,351 @@ func decodeFindEnvironmentsParams(args [1]string, argsEscaped bool, r *http.Requ
 	return params, nil
 }
 
+// FindFeatureFiltersParams is parameters of findFeatureFilters operation.
+type FindFeatureFiltersParams struct {
+	// Include environments for each account.
+	Filter OptString `json:",omitempty,omitzero"`
+	// The maximum number of features to get for this page.
+	Max OptInt `json:",omitempty,omitzero"`
+	// The page number of the results. 0 indexed.
+	Page      OptInt          `json:",omitempty,omitzero"`
+	SortOrder OptNilSortOrder `json:",omitempty,omitzero"`
+	// Should we include all of the details of the search result or just the id and name.
+	IncludeDetails OptBool `json:",omitempty,omitzero"`
+	// The portfolio this feature filter belongs to.
+	ID uuid.UUID
+}
+
+func unpackFindFeatureFiltersParams(packed middleware.Parameters) (params FindFeatureFiltersParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "filter",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Filter = v.(OptString)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "max",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Max = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "page",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Page = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "sortOrder",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SortOrder = v.(OptNilSortOrder)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "includeDetails",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.IncludeDetails = v.(OptBool)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "id",
+			In:   "path",
+		}
+		params.ID = packed[key].(uuid.UUID)
+	}
+	return params
+}
+
+func decodeFindFeatureFiltersParams(args [1]string, argsEscaped bool, r *http.Request) (params FindFeatureFiltersParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: filter.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "filter",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotFilterVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotFilterVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Filter.SetTo(paramsDotFilterVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "filter",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: max.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "max",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotMaxVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotMaxVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Max.SetTo(paramsDotMaxVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "max",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: page.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "page",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPageVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPageVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Page.SetTo(paramsDotPageVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "page",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: sortOrder.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "sortOrder",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotSortOrderVal SortOrder
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSortOrderVal = SortOrder(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.SortOrder.SetTo(paramsDotSortOrderVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.SortOrder.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "sortOrder",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: includeDetails.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "includeDetails",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotIncludeDetailsVal bool
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBool(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotIncludeDetailsVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.IncludeDetails.SetTo(paramsDotIncludeDetailsVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "includeDetails",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode path: id.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToUUID(val)
+				if err != nil {
+					return err
+				}
+
+				params.ID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // FindGroupsParams is parameters of findGroups operation.
 type FindGroupsParams struct {
 	// How to order the results.
-	Order OptSortOrder `json:",omitempty,omitzero"`
+	Order OptNilSortOrder `json:",omitempty,omitzero"`
 	// What to filter the results by.
 	Filter OptString `json:",omitempty,omitzero"`
 	// The id of the portfolio to find.
@@ -4558,7 +5237,7 @@ func unpackFindGroupsParams(packed middleware.Parameters) (params FindGroupsPara
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Order = v.(OptSortOrder)
+			params.Order = v.(OptNilSortOrder)
 		}
 	}
 	{
@@ -4782,7 +5461,7 @@ type FindPeopleParams struct {
 	// Return the number of groups.
 	CountGroups OptBool `json:",omitempty,omitzero"`
 	// How to order the results.
-	Order OptSortOrder `json:",omitempty,omitzero"`
+	Order OptNilSortOrder `json:",omitempty,omitzero"`
 	// What to filter the results by.
 	Filter OptString `json:",omitempty,omitzero"`
 	// Where in the results to start.
@@ -4816,7 +5495,7 @@ func unpackFindPeopleParams(packed middleware.Parameters) (params FindPeoplePara
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Order = v.(OptSortOrder)
+			params.Order = v.(OptNilSortOrder)
 		}
 	}
 	{
@@ -5366,7 +6045,7 @@ func decodeFindPeopleParams(args [0]string, argsEscaped bool, r *http.Request) (
 // FindPortfoliosParams is parameters of findPortfolios operation.
 type FindPortfoliosParams struct {
 	// How to order the results.
-	Order OptSortOrder `json:",omitempty,omitzero"`
+	Order OptNilSortOrder `json:",omitempty,omitzero"`
 	// What to filter the results by.
 	Filter OptString `json:",omitempty,omitzero"`
 	// The parent portfolio to search under. If none is provided, use the top level one.
@@ -5384,7 +6063,7 @@ func unpackFindPortfoliosParams(packed middleware.Parameters) (params FindPortfo
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Order = v.(OptSortOrder)
+			params.Order = v.(OptNilSortOrder)
 		}
 	}
 	{
@@ -6621,6 +7300,8 @@ type GetFeatureByKeyParams struct {
 	Key string
 	// Include the metadata in the returned feature objects. Can be large.
 	IncludeMetaData OptBool `json:",omitempty,omitzero"`
+	// Include the filters associated with the flag.
+	IncludeFilters OptBool `json:",omitempty,omitzero"`
 }
 
 func unpackGetFeatureByKeyParams(packed middleware.Parameters) (params GetFeatureByKeyParams) {
@@ -6645,6 +7326,15 @@ func unpackGetFeatureByKeyParams(packed middleware.Parameters) (params GetFeatur
 		}
 		if v, ok := packed[key]; ok {
 			params.IncludeMetaData = v.(OptBool)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "includeFilters",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.IncludeFilters = v.(OptBool)
 		}
 	}
 	return params
@@ -6780,6 +7470,167 @@ func decodeGetFeatureByKeyParams(args [2]string, argsEscaped bool, r *http.Reque
 		return params, &ogenerrors.DecodeParamError{
 			Name: "includeMetaData",
 			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: includeFilters.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "includeFilters",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotIncludeFiltersVal bool
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBool(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotIncludeFiltersVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.IncludeFilters.SetTo(paramsDotIncludeFiltersVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "includeFilters",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetFeatureFilterParams is parameters of getFeatureFilter operation.
+type GetFeatureFilterParams struct {
+	// The portfolio this feature filter belongs to.
+	ID uuid.UUID
+	// The feature filter id.
+	FilterId uuid.UUID
+}
+
+func unpackGetFeatureFilterParams(packed middleware.Parameters) (params GetFeatureFilterParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "id",
+			In:   "path",
+		}
+		params.ID = packed[key].(uuid.UUID)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "filterId",
+			In:   "path",
+		}
+		params.FilterId = packed[key].(uuid.UUID)
+	}
+	return params
+}
+
+func decodeGetFeatureFilterParams(args [2]string, argsEscaped bool, r *http.Request) (params GetFeatureFilterParams, _ error) {
+	// Decode path: id.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToUUID(val)
+				if err != nil {
+					return err
+				}
+
+				params.ID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: filterId.
+	if err := func() error {
+		param := args[1]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[1])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "filterId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToUUID(val)
+				if err != nil {
+					return err
+				}
+
+				params.FilterId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "filterId",
+			In:   "path",
 			Err:  err,
 		}
 	}
@@ -7669,6 +8520,197 @@ func decodeGetLoginUrlForProviderParams(args [1]string, argsEscaped bool, r *htt
 	return params, nil
 }
 
+// GetMatchingFiltersParams is parameters of getMatchingFilters operation.
+type GetMatchingFiltersParams struct {
+	// The portfolio this feature filter belongs to.
+	ID uuid.UUID
+	// The list of filters to find service accounts/applications for.
+	Filters []uuid.UUID `json:",omitempty"`
+	// Application (with features) or Service Account as desired.
+	MatchType MatchTypeEnum
+}
+
+func unpackGetMatchingFiltersParams(packed middleware.Parameters) (params GetMatchingFiltersParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "id",
+			In:   "path",
+		}
+		params.ID = packed[key].(uuid.UUID)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "filters",
+			In:   "query",
+		}
+		params.Filters = packed[key].([]uuid.UUID)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "matchType",
+			In:   "path",
+		}
+		params.MatchType = packed[key].(MatchTypeEnum)
+	}
+	return params
+}
+
+func decodeGetMatchingFiltersParams(args [2]string, argsEscaped bool, r *http.Request) (params GetMatchingFiltersParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode path: id.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToUUID(val)
+				if err != nil {
+					return err
+				}
+
+				params.ID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode query: filters.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "filters",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotFiltersVal uuid.UUID
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToUUID(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotFiltersVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Filters = append(params.Filters, paramsDotFiltersVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if params.Filters == nil {
+					return errors.New("nil is invalid value")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "filters",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode path: matchType.
+	if err := func() error {
+		param := args[1]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[1])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "matchType",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.MatchType = MatchTypeEnum(c)
+				return nil
+			}(); err != nil {
+				return err
+			}
+			if err := func() error {
+				if err := params.MatchType.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "matchType",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetPersonParams is parameters of getPerson operation.
 type GetPersonParams struct {
 	// The id of the person to find. Duplicated here as we accept a plain string (not only a uuid).
@@ -8069,7 +9111,9 @@ type GetServiceAccountParams struct {
 	ID string
 	// Include permissions in return.
 	IncludePermissions OptBool `json:",omitempty,omitzero"`
-	ByApplicationId    OptUUID `json:",omitempty,omitzero"`
+	// Include filters in return.
+	IncludeFilters  OptBool `json:",omitempty,omitzero"`
+	ByApplicationId OptUUID `json:",omitempty,omitzero"`
 }
 
 func unpackGetServiceAccountParams(packed middleware.Parameters) (params GetServiceAccountParams) {
@@ -8087,6 +9131,15 @@ func unpackGetServiceAccountParams(packed middleware.Parameters) (params GetServ
 		}
 		if v, ok := packed[key]; ok {
 			params.IncludePermissions = v.(OptBool)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "includeFilters",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.IncludeFilters = v.(OptBool)
 		}
 	}
 	{
@@ -8185,6 +9238,47 @@ func decodeGetServiceAccountParams(args [1]string, argsEscaped bool, r *http.Req
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "includePermissions",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: includeFilters.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "includeFilters",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotIncludeFiltersVal bool
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBool(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotIncludeFiltersVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.IncludeFilters.SetTo(paramsDotIncludeFiltersVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "includeFilters",
 			In:   "query",
 			Err:  err,
 		}
@@ -8782,8 +9876,8 @@ type ListApplicationStrategiesParams struct {
 	// Include archived strategies.
 	IncludeArchived OptBool `json:",omitempty,omitzero"`
 	// A filter to apply to the application strategies - partial match of name.
-	Filter    OptString    `json:",omitempty,omitzero"`
-	SortOrder OptSortOrder `json:",omitempty,omitzero"`
+	Filter    OptString       `json:",omitempty,omitzero"`
+	SortOrder OptNilSortOrder `json:",omitempty,omitzero"`
 	// The maximum number of application strategies to get for this page.
 	Max OptInt `json:",omitempty,omitzero"`
 	// The page number of the results. 0 indexed.
@@ -8821,7 +9915,7 @@ func unpackListApplicationStrategiesParams(packed middleware.Parameters) (params
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.SortOrder = v.(OptSortOrder)
+			params.SortOrder = v.(OptNilSortOrder)
 		}
 	}
 	{
@@ -9229,8 +10323,8 @@ type ListFeatureGroupsParams struct {
 	// The maximum number of features to get for this page.
 	Max OptInt `json:",omitempty,omitzero"`
 	// The page number of the results. 0 indexed.
-	Page      OptInt       `json:",omitempty,omitzero"`
-	SortOrder OptSortOrder `json:",omitempty,omitzero"`
+	Page      OptInt          `json:",omitempty,omitzero"`
+	SortOrder OptNilSortOrder `json:",omitempty,omitzero"`
 	// Match based on environment id.
 	EnvironmentId OptUUID `json:",omitempty,omitzero"`
 	// The id of the application to find.
@@ -9271,7 +10365,7 @@ func unpackListFeatureGroupsParams(packed middleware.Parameters) (params ListFea
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.SortOrder = v.(OptSortOrder)
+			params.SortOrder = v.(OptNilSortOrder)
 		}
 	}
 	{
@@ -12425,6 +13519,72 @@ func decodeUpdateEnvironmentV2Params(args [1]string, argsEscaped bool, r *http.R
 	return params, nil
 }
 
+// UpdateFeatureFilterParams is parameters of updateFeatureFilter operation.
+type UpdateFeatureFilterParams struct {
+	// The portfolio this feature filter belongs to.
+	ID uuid.UUID
+}
+
+func unpackUpdateFeatureFilterParams(packed middleware.Parameters) (params UpdateFeatureFilterParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "id",
+			In:   "path",
+		}
+		params.ID = packed[key].(uuid.UUID)
+	}
+	return params
+}
+
+func decodeUpdateFeatureFilterParams(args [1]string, argsEscaped bool, r *http.Request) (params UpdateFeatureFilterParams, _ error) {
+	// Decode path: id.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToUUID(val)
+				if err != nil {
+					return err
+				}
+
+				params.ID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // UpdateFeatureForApplicationParams is parameters of updateFeatureForApplication operation.
 type UpdateFeatureForApplicationParams struct {
 	// The id of the application to find.
@@ -12433,6 +13593,8 @@ type UpdateFeatureForApplicationParams struct {
 	Key string
 	// Include the metadata in the returned feature objects. Can be large.
 	IncludeMetaData OptBool `json:",omitempty,omitzero"`
+	// Include the filters associated with the flag.
+	IncludeFilters OptBool `json:",omitempty,omitzero"`
 }
 
 func unpackUpdateFeatureForApplicationParams(packed middleware.Parameters) (params UpdateFeatureForApplicationParams) {
@@ -12457,6 +13619,15 @@ func unpackUpdateFeatureForApplicationParams(packed middleware.Parameters) (para
 		}
 		if v, ok := packed[key]; ok {
 			params.IncludeMetaData = v.(OptBool)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "includeFilters",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.IncludeFilters = v.(OptBool)
 		}
 	}
 	return params
@@ -12591,6 +13762,47 @@ func decodeUpdateFeatureForApplicationParams(args [2]string, argsEscaped bool, r
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "includeMetaData",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: includeFilters.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "includeFilters",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotIncludeFiltersVal bool
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBool(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotIncludeFiltersVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.IncludeFilters.SetTo(paramsDotIncludeFiltersVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "includeFilters",
 			In:   "query",
 			Err:  err,
 		}

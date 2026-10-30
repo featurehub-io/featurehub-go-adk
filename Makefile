@@ -1,5 +1,6 @@
 OGEN := $(shell go env GOPATH)/bin/ogen
-OPENAPI_SPEC := api/mrapi-1.2.5.yaml
+#OPENAPI_SPEC := api/mrapi-1.2.5.yaml
+OPENAPI_SPEC := api/final.yaml
 OPENAPI_URL  := https://raw.githubusercontent.com/featurehub-io/featurehub/refs/heads/main/infra/api-bucket/files/mrapi/1.2.5.yaml
 
 .PHONY: all generate build test clean download-spec install-ogen

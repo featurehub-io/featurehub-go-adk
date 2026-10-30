@@ -31,7 +31,7 @@ type Handler interface {
 	// Change password.
 	//
 	// PUT /mr-api/authentication/{id}/changePassword
-	ChangePassword(ctx context.Context, req PasswordUpdate, params ChangePasswordParams) (ChangePasswordRes, error)
+	ChangePassword(ctx context.Context, req *PasswordUpdate, params ChangePasswordParams) (ChangePasswordRes, error)
 	// CreateApplication implements createApplication operation.
 	//
 	// Create a new application.
@@ -57,12 +57,16 @@ type Handler interface {
 	//
 	// POST /mr-api/application/{id}/environment
 	CreateEnvironmentOnApplication(ctx context.Context, req *CreateEnvironment, params CreateEnvironmentOnApplicationParams) (CreateEnvironmentOnApplicationRes, error)
+	// CreateFeatureFilter implements createFeatureFilter operation.
+	//
+	// POST /mr-api/portfolio/{id}/feature-filter
+	CreateFeatureFilter(ctx context.Context, req *CreateFeatureFilter, params CreateFeatureFilterParams) (CreateFeatureFilterRes, error)
 	// CreateFeatureForEnvironment implements createFeatureForEnvironment operation.
 	//
 	// Create a specific feature in this environment.
 	//
 	// POST /mr-api/features/{eid}/feature/{key}
-	CreateFeatureForEnvironment(ctx context.Context, req FeatureValue, params CreateFeatureForEnvironmentParams) (CreateFeatureForEnvironmentRes, error)
+	CreateFeatureForEnvironment(ctx context.Context, req *FeatureValue, params CreateFeatureForEnvironmentParams) (CreateFeatureForEnvironmentRes, error)
 	// CreateFeatureGroup implements createFeatureGroup operation.
 	//
 	// Get feature groups for this application.
@@ -74,7 +78,7 @@ type Handler interface {
 	// Add a new feature to this application, returns all features.
 	//
 	// POST /mr-api/application/{id}/features
-	CreateFeaturesForApplication(ctx context.Context, req CreateFeature, params CreateFeaturesForApplicationParams) (CreateFeaturesForApplicationRes, error)
+	CreateFeaturesForApplication(ctx context.Context, req *CreateFeature, params CreateFeaturesForApplicationParams) (CreateFeaturesForApplicationRes, error)
 	// CreateGroup implements createGroup operation.
 	//
 	// Create a new group.
@@ -92,7 +96,7 @@ type Handler interface {
 	// Create a new person.
 	//
 	// POST /mr-api/person
-	CreatePerson(ctx context.Context, req CreatePersonDetails, params CreatePersonParams) (CreatePersonRes, error)
+	CreatePerson(ctx context.Context, req *CreatePersonDetails, params CreatePersonParams) (CreatePersonRes, error)
 	// CreatePortfolio implements createPortfolio operation.
 	//
 	// Create a new portfolio.
@@ -104,7 +108,7 @@ type Handler interface {
 	// Add a new service account.
 	//
 	// POST /mr-api/portfolio/{id}/service-account
-	CreateServiceAccountInPortfolio(ctx context.Context, req CreateServiceAccount, params CreateServiceAccountInPortfolioParams) (CreateServiceAccountInPortfolioRes, error)
+	CreateServiceAccountInPortfolio(ctx context.Context, req *CreateServiceAccount, params CreateServiceAccountInPortfolioParams) (CreateServiceAccountInPortfolioRes, error)
 	// DecryptSystemConfig implements decryptSystemConfig operation.
 	//
 	// When passed a key and decrypt is enabled and the user has the right permissions, it will decrypt
@@ -128,6 +132,13 @@ type Handler interface {
 	//
 	// DELETE /mr-api/environment/{eid}
 	DeleteEnvironment(ctx context.Context, params DeleteEnvironmentParams) (DeleteEnvironmentRes, error)
+	// DeleteFeatureFilter implements deleteFeatureFilter operation.
+	//
+	// Delete the filter, it must have the same ID and version as the existing one to be successfully
+	// deleted.
+	//
+	// DELETE /mr-api/portfolio/{id}/feature-filter/{filterId}
+	DeleteFeatureFilter(ctx context.Context, params DeleteFeatureFilterParams) (DeleteFeatureFilterRes, error)
 	// DeleteFeatureForApplication implements deleteFeatureForApplication operation.
 	//
 	// Updates all named features in this application, returns all features.
@@ -201,6 +212,12 @@ type Handler interface {
 	//
 	// GET /mr-api/application/{id}/environment
 	FindEnvironments(ctx context.Context, params FindEnvironmentsParams) (FindEnvironmentsRes, error)
+	// FindFeatureFilters implements findFeatureFilters operation.
+	//
+	// Gets all of the feature filters listed in this portfolio with appropriate filtering.
+	//
+	// GET /mr-api/portfolio/{id}/feature-filter
+	FindFeatureFilters(ctx context.Context, params FindFeatureFiltersParams) (FindFeatureFiltersRes, error)
 	// FindGroups implements findGroups operation.
 	//
 	// Gets a list of groups.
@@ -253,6 +270,10 @@ type Handler interface {
 	//
 	// GET /mr-api/application/{id}/features/{key}
 	GetFeatureByKey(ctx context.Context, params GetFeatureByKeyParams) (GetFeatureByKeyRes, error)
+	// GetFeatureFilter implements getFeatureFilter operation.
+	//
+	// GET /mr-api/portfolio/{id}/feature-filter/{filterId}
+	GetFeatureFilter(ctx context.Context, params GetFeatureFilterParams) (GetFeatureFilterRes, error)
 	// GetFeatureForEnvironment implements getFeatureForEnvironment operation.
 	//
 	// Update a specific feature in this environment.
@@ -301,6 +322,10 @@ type Handler interface {
 	//
 	// GET /mr-api/external-provider/{provider}
 	GetLoginUrlForProvider(ctx context.Context, params GetLoginUrlForProviderParams) (GetLoginUrlForProviderRes, error)
+	// GetMatchingFilters implements getMatchingFilters operation.
+	//
+	// GET /mr-api/portfolio/{id}/feature-filter/matching/{matchType}
+	GetMatchingFilters(ctx context.Context, params GetMatchingFiltersParams) (GetMatchingFiltersRes, error)
 	// GetPerson implements getPerson operation.
 	//
 	// Get person.
@@ -384,7 +409,7 @@ type Handler interface {
 	// Login to Feature Hub.
 	//
 	// POST /mr-api/login
-	Login(ctx context.Context, req UserCredentials) (LoginRes, error)
+	Login(ctx context.Context, req *UserCredentials) (LoginRes, error)
 	// Logout implements logout operation.
 	//
 	// Get person by token.
@@ -402,13 +427,13 @@ type Handler interface {
 	// Create a new user.
 	//
 	// POST /mr-api/authentication
-	RegisterPerson(ctx context.Context, req PersonRegistrationDetails) (RegisterPersonRes, error)
+	RegisterPerson(ctx context.Context, req *PersonRegistrationDetails) (RegisterPersonRes, error)
 	// ReplaceTempPassword implements replaceTempPassword operation.
 	//
 	// Replace temporary password.
 	//
 	// PUT /mr-api/authentication/{id}/replaceTempPassword
-	ReplaceTempPassword(ctx context.Context, req PasswordReset, params ReplaceTempPasswordParams) (ReplaceTempPasswordRes, error)
+	ReplaceTempPassword(ctx context.Context, req *PasswordReset, params ReplaceTempPasswordParams) (ReplaceTempPasswordRes, error)
 	// ResetApiKey implements resetApiKey operation.
 	//
 	// Causes a new API Key to be generated. Ensure you confirm this with the user.
@@ -426,7 +451,7 @@ type Handler interface {
 	// Reset password.
 	//
 	// PUT /mr-api/authentication/{id}/resetPassword
-	ResetPassword(ctx context.Context, req PasswordReset, params ResetPasswordParams) (ResetPasswordRes, error)
+	ResetPassword(ctx context.Context, req *PasswordReset, params ResetPasswordParams) (ResetPasswordRes, error)
 	// ResetSecurityToken implements resetSecurityToken operation.
 	//
 	// Reset security token of supported person type (usually service accounts only).
@@ -516,26 +541,30 @@ type Handler interface {
 	//
 	// PUT /mr-api/environment/{eid}/v2
 	UpdateEnvironmentV2(ctx context.Context, req *UpdateEnvironment, params UpdateEnvironmentV2Params) (UpdateEnvironmentV2Res, error)
+	// UpdateFeatureFilter implements updateFeatureFilter operation.
+	//
+	// PUT /mr-api/portfolio/{id}/feature-filter
+	UpdateFeatureFilter(ctx context.Context, req *FeatureFilter, params UpdateFeatureFilterParams) (UpdateFeatureFilterRes, error)
 	// UpdateFeatureForApplication implements updateFeatureForApplication operation.
 	//
 	// Updates all named features in this application, returns all features. Use this ONLY if you wish to
 	// change the key.
 	//
 	// PUT /mr-api/application/{id}/features/{key}
-	UpdateFeatureForApplication(ctx context.Context, req Feature, params UpdateFeatureForApplicationParams) (UpdateFeatureForApplicationRes, error)
+	UpdateFeatureForApplication(ctx context.Context, req *Feature, params UpdateFeatureForApplicationParams) (UpdateFeatureForApplicationRes, error)
 	// UpdateFeatureForApplicationOnFeature implements updateFeatureForApplicationOnFeature operation.
 	//
 	// Updates all named features in this application, returns all features by default otherwise just the
 	// feature updated.
 	//
 	// PUT /mr-api/application/{id}/features
-	UpdateFeatureForApplicationOnFeature(ctx context.Context, req Feature, params UpdateFeatureForApplicationOnFeatureParams) (UpdateFeatureForApplicationOnFeatureRes, error)
+	UpdateFeatureForApplicationOnFeature(ctx context.Context, req *Feature, params UpdateFeatureForApplicationOnFeatureParams) (UpdateFeatureForApplicationOnFeatureRes, error)
 	// UpdateFeatureForEnvironment implements updateFeatureForEnvironment operation.
 	//
 	// Update a specific feature in this environment.
 	//
 	// PUT /mr-api/features/{eid}/feature/{key}
-	UpdateFeatureForEnvironment(ctx context.Context, req FeatureValue, params UpdateFeatureForEnvironmentParams) (UpdateFeatureForEnvironmentRes, error)
+	UpdateFeatureForEnvironment(ctx context.Context, req *FeatureValue, params UpdateFeatureForEnvironmentParams) (UpdateFeatureForEnvironmentRes, error)
 	// UpdateFeatureGroup implements updateFeatureGroup operation.
 	//
 	// Get feature groups for this application.
@@ -590,14 +619,14 @@ type Handler interface {
 	// Deprecated: schema marks this operation as deprecated.
 	//
 	// PUT /mr-api/service-account/{id}
-	UpdateServiceAccount(ctx context.Context, req ServiceAccount, params UpdateServiceAccountParams) (UpdateServiceAccountRes, error)
+	UpdateServiceAccount(ctx context.Context, req *ServiceAccount, params UpdateServiceAccountParams) (UpdateServiceAccountRes, error)
 	// UpdateServiceAccountOnPortfolio implements updateServiceAccountOnPortfolio operation.
 	//
 	// Update this service account, overwiting any attached environment permissions this user has access
 	// to.
 	//
 	// PUT /mr-api/portfolio/{id}/service-account
-	UpdateServiceAccountOnPortfolio(ctx context.Context, req ServiceAccount, params UpdateServiceAccountOnPortfolioParams) (UpdateServiceAccountOnPortfolioRes, error)
+	UpdateServiceAccountOnPortfolio(ctx context.Context, req *ServiceAccount, params UpdateServiceAccountOnPortfolioParams) (UpdateServiceAccountOnPortfolioRes, error)
 	// Validate implements validate operation.
 	//
 	// Provide server validation responses for this group of rollout strategies.

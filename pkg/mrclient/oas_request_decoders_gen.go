@@ -95,7 +95,7 @@ func (s *Server) decodeCacheRefreshRequest(r *http.Request) (
 }
 
 func (s *Server) decodeChangePasswordRequest(r *http.Request) (
-	req PasswordUpdate,
+	req *PasswordUpdate,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -159,7 +159,15 @@ func (s *Server) decodeChangePasswordRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
@@ -481,8 +489,87 @@ func (s *Server) decodeCreateEnvironmentOnApplicationRequest(r *http.Request) (
 	}
 }
 
+func (s *Server) decodeCreateFeatureFilterRequest(r *http.Request) (
+	req *CreateFeatureFilter,
+	rawBody []byte,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = errors.Join(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = errors.Join(rerr, close())
+		}
+	}()
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "application/json":
+		if r.ContentLength == 0 {
+			return req, rawBody, close, validate.ErrBodyRequired
+		}
+		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
+		if err != nil {
+			return req, rawBody, close, err
+		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
+
+		if len(buf) == 0 {
+			return req, rawBody, close, validate.ErrBodyRequired
+		}
+
+		rawBody = append(rawBody, buf...)
+		d := jx.DecodeBytes(buf)
+
+		var request CreateFeatureFilter
+		if err := func() error {
+			if err := request.Decode(d); err != nil {
+				return err
+			}
+			if err := d.Skip(); err != io.EOF {
+				return errors.New("unexpected trailing data")
+			}
+			return nil
+		}(); err != nil {
+			err = &ogenerrors.DecodeBodyError{
+				ContentType: ct,
+				Body:        buf,
+				Err:         err,
+			}
+			return req, rawBody, close, err
+		}
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
+	default:
+		return req, rawBody, close, validate.InvalidContentType(ct)
+	}
+}
+
 func (s *Server) decodeCreateFeatureForEnvironmentRequest(r *http.Request) (
-	req FeatureValue,
+	req *FeatureValue,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -546,7 +633,15 @@ func (s *Server) decodeCreateFeatureForEnvironmentRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
@@ -632,7 +727,7 @@ func (s *Server) decodeCreateFeatureGroupRequest(r *http.Request) (
 }
 
 func (s *Server) decodeCreateFeaturesForApplicationRequest(r *http.Request) (
-	req CreateFeature,
+	req *CreateFeature,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -696,7 +791,15 @@ func (s *Server) decodeCreateFeaturesForApplicationRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
@@ -861,7 +964,7 @@ func (s *Server) decodeCreateOrUpdateSystemConfigsRequest(r *http.Request) (
 }
 
 func (s *Server) decodeCreatePersonRequest(r *http.Request) (
-	req CreatePersonDetails,
+	req *CreatePersonDetails,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -925,7 +1028,15 @@ func (s *Server) decodeCreatePersonRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
@@ -1011,7 +1122,7 @@ func (s *Server) decodeCreatePortfolioRequest(r *http.Request) (
 }
 
 func (s *Server) decodeCreateServiceAccountInPortfolioRequest(r *http.Request) (
-	req CreateServiceAccount,
+	req *CreateServiceAccount,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -1075,7 +1186,15 @@ func (s *Server) decodeCreateServiceAccountInPortfolioRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
@@ -1186,7 +1305,7 @@ func (s *Server) decodeEnvironmentOrderingRequest(r *http.Request) (
 }
 
 func (s *Server) decodeLoginRequest(r *http.Request) (
-	req UserCredentials,
+	req *UserCredentials,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -1250,14 +1369,22 @@ func (s *Server) decodeLoginRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeRegisterPersonRequest(r *http.Request) (
-	req PersonRegistrationDetails,
+	req *PersonRegistrationDetails,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -1321,14 +1448,22 @@ func (s *Server) decodeRegisterPersonRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeReplaceTempPasswordRequest(r *http.Request) (
-	req PasswordReset,
+	req *PasswordReset,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -1392,14 +1527,14 @@ func (s *Server) decodeReplaceTempPasswordRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeResetPasswordRequest(r *http.Request) (
-	req PasswordReset,
+	req *PasswordReset,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -1463,7 +1598,7 @@ func (s *Server) decodeResetPasswordRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
@@ -1767,6 +1902,23 @@ func (s *Server) decodeUpdateAllFeatureValuesByApplicationForKeyRequest(r *http.
 			if request == nil {
 				return errors.New("nil is invalid value")
 			}
+			var failures []validate.FieldError
+			for i, elem := range request {
+				if err := func() error {
+					if err := elem.Validate(); err != nil {
+						return err
+					}
+					return nil
+				}(); err != nil {
+					failures = append(failures, validate.FieldError{
+						Name:  fmt.Sprintf("[%d]", i),
+						Error: err,
+					})
+				}
+			}
+			if len(failures) > 0 {
+				return &validate.Error{Fields: failures}
+			}
 			return nil
 		}(); err != nil {
 			return req, rawBody, close, errors.Wrap(err, "validate")
@@ -1853,6 +2005,23 @@ func (s *Server) decodeUpdateAllFeaturesForEnvironmentRequest(r *http.Request) (
 		if err := func() error {
 			if request == nil {
 				return errors.New("nil is invalid value")
+			}
+			var failures []validate.FieldError
+			for i, elem := range request {
+				if err := func() error {
+					if err := elem.Validate(); err != nil {
+						return err
+					}
+					return nil
+				}(); err != nil {
+					failures = append(failures, validate.FieldError{
+						Name:  fmt.Sprintf("[%d]", i),
+						Error: err,
+					})
+				}
+			}
+			if len(failures) > 0 {
+				return &validate.Error{Fields: failures}
 			}
 			return nil
 		}(); err != nil {
@@ -2338,8 +2507,87 @@ func (s *Server) decodeUpdateEnvironmentV2Request(r *http.Request) (
 	}
 }
 
+func (s *Server) decodeUpdateFeatureFilterRequest(r *http.Request) (
+	req *FeatureFilter,
+	rawBody []byte,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = errors.Join(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = errors.Join(rerr, close())
+		}
+	}()
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "application/json":
+		if r.ContentLength == 0 {
+			return req, rawBody, close, validate.ErrBodyRequired
+		}
+		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
+		if err != nil {
+			return req, rawBody, close, err
+		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
+
+		if len(buf) == 0 {
+			return req, rawBody, close, validate.ErrBodyRequired
+		}
+
+		rawBody = append(rawBody, buf...)
+		d := jx.DecodeBytes(buf)
+
+		var request FeatureFilter
+		if err := func() error {
+			if err := request.Decode(d); err != nil {
+				return err
+			}
+			if err := d.Skip(); err != io.EOF {
+				return errors.New("unexpected trailing data")
+			}
+			return nil
+		}(); err != nil {
+			err = &ogenerrors.DecodeBodyError{
+				ContentType: ct,
+				Body:        buf,
+				Err:         err,
+			}
+			return req, rawBody, close, err
+		}
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
+	default:
+		return req, rawBody, close, validate.InvalidContentType(ct)
+	}
+}
+
 func (s *Server) decodeUpdateFeatureForApplicationRequest(r *http.Request) (
-	req Feature,
+	req *Feature,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -2403,14 +2651,22 @@ func (s *Server) decodeUpdateFeatureForApplicationRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeUpdateFeatureForApplicationOnFeatureRequest(r *http.Request) (
-	req Feature,
+	req *Feature,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -2474,14 +2730,22 @@ func (s *Server) decodeUpdateFeatureForApplicationOnFeatureRequest(r *http.Reque
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeUpdateFeatureForEnvironmentRequest(r *http.Request) (
-	req FeatureValue,
+	req *FeatureValue,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -2545,7 +2809,15 @@ func (s *Server) decodeUpdateFeatureForEnvironmentRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
@@ -3105,7 +3377,7 @@ func (s *Server) decodeUpdatePortfolioOnOrganisationRequest(r *http.Request) (
 }
 
 func (s *Server) decodeUpdateServiceAccountRequest(r *http.Request) (
-	req ServiceAccount,
+	req *ServiceAccount,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -3169,14 +3441,22 @@ func (s *Server) decodeUpdateServiceAccountRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeUpdateServiceAccountOnPortfolioRequest(r *http.Request) (
-	req ServiceAccount,
+	req *ServiceAccount,
 	rawBody []byte,
 	close func() error,
 	rerr error,
@@ -3240,7 +3520,15 @@ func (s *Server) decodeUpdateServiceAccountOnPortfolioRequest(r *http.Request) (
 			}
 			return req, rawBody, close, err
 		}
-		return request, rawBody, close, nil
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, rawBody, close, errors.Wrap(err, "validate")
+		}
+		return &request, rawBody, close, nil
 	default:
 		return req, rawBody, close, validate.InvalidContentType(ct)
 	}

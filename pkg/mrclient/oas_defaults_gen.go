@@ -35,6 +35,14 @@ func (s *CreateEnvironment) setDefaults() {
 }
 
 // setDefaults set default value of fields.
+func (s *CreatePersonDetails) setDefaults() {
+	{
+		val := PersonType("person")
+		s.PersonType = val
+	}
+}
+
+// setDefaults set default value of fields.
 func (s *FeatureGroup) setDefaults() {
 	{
 		val := bool(false)
@@ -47,6 +55,18 @@ func (s *FeatureGroupCreate) setDefaults() {
 	{
 		val := bool(false)
 		s.Disabled.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *FeatureValue) setDefaults() {
+	{
+		val := bool(false)
+		s.Retired.SetTo(val)
+	}
+	{
+		val := int64(0)
+		s.Version.SetTo(val)
 	}
 }
 
@@ -67,10 +87,34 @@ func (s *HiddenEnvironments) setDefaults() {
 }
 
 // setDefaults set default value of fields.
+func (s *PasswordReset) setDefaults() {
+	{
+		val := bool(false)
+		s.Reactivate.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
 func (s *RolloutStrategy) setDefaults() {
 	{
 		val := bool(false)
 		s.Disabled.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *RolloutStrategyInstance) setDefaults() {
+	{
+		val := bool(false)
+		s.Disabled.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *SearchPerson) setDefaults() {
+	{
+		val := PersonType("person")
+		s.PersonType = val
 	}
 }
 
